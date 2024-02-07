@@ -24,13 +24,15 @@ public class Drivetrain
 
 	LynxModule voltageRegulator;
 
-	DrivetrainConstants constant;
+	Gamepad currentGamepad;
+	Gamepad prevGamepad;
 
-	PDFController headingController = new PDFController(0.0, 0.0, 0.0);
+	PDFController headingPDF = new PDFController(0.0, 0.0, 0.0);
 
 	LoopTime loopTime = new LoopTime();
 
-	double targetHeading = 0.0;
+	double targetHeading;
+	boolean headingControl = false;
 
 	public Drivetrain() {}
 
@@ -63,24 +65,26 @@ public class Drivetrain
 		imu.initialize(parameters);
 	}
 
-	public void setInitialHeading(double startingHeading)
-	{
-		targetHeading = startingHeading;
-	}
-
 	public void update(Gamepad gamepad)
 	{
 		double drive = -gamepad.left_stick_y;
 		double strafe = gamepad.left_stick_x;
 		double turn = gamepad.right_trigger - gamepad.left_trigger;
+		double heading = 0.0;
 
-		adjustHeading(turn);
+		/** Heading PDF */
+		if (turn == 0) {
+			heading = imu.getAngularOrientation().firstAngle;
+			headingControl = true;
+		} else headingControl = false;
+
+		if (stoppedSteering())
+			targetHeading = heading;
+
+		if (headingControl)
+			turn += headingPDF.update(targetHeading, heading);
 
 		/** Mecanum kinematics */
-
-		Orientation heading = imu.getAngularOrientation();
-		turn = headingController.update(targetHeading, heading.firstAngle);
-
 		double flPower = drive + strafe + turn;
 		double rlPower = drive - strafe + turn;
 		double rrPower = drive + strafe - turn;
@@ -94,9 +98,12 @@ public class Drivetrain
 		frontRight.setPower(frPower);
 	}
 
-	public void adjustHeading(double turn)
+	boolean stoppedSteering()
 	{
-		targetHeading += (loopTime.get() / DrivetrainConstants.testedLooptime) * turn * DrivetrainConstants.measuredIncrement;
+		if ((prevGamepad.left_trigger - prevGamepad.right_trigger) != 0.0 &&
+				(currentGamepad.left_trigger - currentGamepad.right_trigger) == 0)
+			return true;
+		else return false;
 	}
 
 	private void powerRegulation (double power1, double power2, double power3, double power4)
