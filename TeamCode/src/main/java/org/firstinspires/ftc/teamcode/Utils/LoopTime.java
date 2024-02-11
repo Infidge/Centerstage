@@ -3,17 +3,17 @@ package org.firstinspires.ftc.teamcode.Utils;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 public class LoopTime {
-    public ElapsedTime loopTime = new ElapsedTime();
+
+    private final ElapsedTime loopTime = new ElapsedTime();
 
     public LoopTime() {}
 
-    public void reset()
-    {
+    public void reset() {
         this.loopTime.reset();
     }
 
-    public double get()
-    {
+    public double get() {
         return this.loopTime.milliseconds();
     }
+
 }

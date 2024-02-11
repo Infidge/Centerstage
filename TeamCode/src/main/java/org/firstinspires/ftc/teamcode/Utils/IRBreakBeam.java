@@ -3,18 +3,18 @@ package org.firstinspires.ftc.teamcode.Utils;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
-public class LimitSwitch {
+public class IRBreakBeam {
 
-	private DigitalChannel limitSwitch;
+	private DigitalChannel beam;
 
-	public LimitSwitch() {};
+	public IRBreakBeam() {}
 
 	public void setName(String name, HardwareMap hwMap) {
-		limitSwitch = hwMap.get(DigitalChannel.class, name);
+		beam = hwMap.get(DigitalChannel.class, name);
 	}
 
-	public boolean isPressed() {
-		return limitSwitch.getState();
+	public boolean isBroken() {
+		return !beam.getState();
 	}
 
 }

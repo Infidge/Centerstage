@@ -7,22 +7,21 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 
-public class Optimised_Motor {
+public class OptimisedMotor {
 
-    DcMotorEx motor;
+    private DcMotorEx motor;
 
-    double lastPower = 2.0;
-    double epsilon = 0.01;
+    private double lastPower = 2.0;
+    private static final double EPSILON = 0.01;
 
-    public Optimised_Motor() {
-    }
+    public OptimisedMotor() {}
 
     public void setName(String name, HardwareMap hwMap) {
         this.motor = hwMap.get(DcMotorEx.class, name);
     }
 
     public void setPower(Double power) {
-        if (Math.abs(lastPower - power) > epsilon) {
+        if (Math.abs(lastPower - power) > EPSILON) {
             this.motor.setPower(power);
             this.lastPower = power;
         }

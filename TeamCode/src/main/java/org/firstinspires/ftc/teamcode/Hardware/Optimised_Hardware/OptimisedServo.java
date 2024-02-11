@@ -3,22 +3,21 @@ package org.firstinspires.ftc.teamcode.Hardware.Optimised_Hardware;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
-public class Optimised_Servo {
+public class OptimisedServo {
 
-    Servo servo;
+    private Servo servo;
 
-    double lastPosition = 2.0;
-    double epsilon = 0.01;
+    private double lastPosition = 2.0;
+    private static final double EPSILON = 0.01;
 
-    public Optimised_Servo() {
-    }
+    public OptimisedServo() {}
 
     public void setName(String name, HardwareMap hwMap) {
         this.servo = hwMap.get(Servo.class, name);
     }
 
     public void setPosition(Double position) {
-        if (Math.abs(lastPosition - position) > epsilon) {
+        if (Math.abs(lastPosition - position) > EPSILON) {
             this.servo.setPosition(position);
             this.lastPosition = position;
         }
