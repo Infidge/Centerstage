@@ -1,7 +1,7 @@
-package org.firstinspires.ftc.teamcode.Hardware.Subsystems;
+package org.firstinspires.ftc.teamcode.hardware.subsystem;
 
-import org.firstinspires.ftc.teamcode.Hardware.OptimisedHardware.OptimisedServo;
-import org.firstinspires.ftc.teamcode.Utils.IRBreakBeam;
+import org.firstinspires.ftc.teamcode.hardware.optimised.OptimisedServo;
+import org.firstinspires.ftc.teamcode.util.IRBreakBeam;
 
 public class Claw {
 

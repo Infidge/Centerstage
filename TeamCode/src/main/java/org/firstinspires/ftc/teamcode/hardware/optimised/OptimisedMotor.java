@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.Hardware.OptimisedHardware;
+package org.firstinspires.ftc.teamcode.hardware.optimised;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;

@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.Hardware.Subsystems;
+package org.firstinspires.ftc.teamcode.hardware.subsystem;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.lynx.LynxModule;
@@ -8,9 +8,9 @@ import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.navigation.VoltageUnit;
-import org.firstinspires.ftc.teamcode.Hardware.OptimisedHardware.OptimisedMotor;
-import org.firstinspires.ftc.teamcode.PIDF.PDFController;
-import org.firstinspires.ftc.teamcode.Utils.LoopTime;
+import org.firstinspires.ftc.teamcode.hardware.optimised.OptimisedMotor;
+import org.firstinspires.ftc.teamcode.pidf.PDFController;
+import org.firstinspires.ftc.teamcode.util.LoopTime;
 
 public class Drivetrain {
 
