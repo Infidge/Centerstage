@@ -38,6 +38,10 @@ public class Intake {
 		rightBeam.setName("intakeRightBeam", hwMap);
 	}
 
+	class HorizontalExtension extends MotionProfileMovement {
+
+	}
+
 	public void spinInwards() {
 		spinnersState = IntakeStates.Spinners.IN;
 	}

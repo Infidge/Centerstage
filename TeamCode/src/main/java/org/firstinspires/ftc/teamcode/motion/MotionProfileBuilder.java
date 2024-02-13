@@ -21,8 +21,8 @@ public class MotionProfileBuilder {
 		return this;
 	}
 
-	public MotionProfie build() {
-		return new MotionProfie(max_acceleration, max_deceleration, max_velocity);
+	public MotionProfile build() {
+		return new MotionProfile(max_acceleration, max_deceleration, max_velocity);
 	}
 
 }
