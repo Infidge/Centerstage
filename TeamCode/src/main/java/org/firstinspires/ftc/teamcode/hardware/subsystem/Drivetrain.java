@@ -8,7 +8,7 @@ import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.navigation.VoltageUnit;
-import org.firstinspires.ftc.teamcode.hardware.optimised.OptimisedMotor;
+import org.firstinspires.ftc.teamcode.hardware.common.OptimisedMotor;
 import org.firstinspires.ftc.teamcode.pidf.PDFController;
 import org.firstinspires.ftc.teamcode.util.LoopTime;
 

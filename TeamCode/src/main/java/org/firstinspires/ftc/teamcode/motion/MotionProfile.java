@@ -4,33 +4,35 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 public class MotionProfile {
 
-	private final double max_acceleration;
-	private final double max_deceleration;
+	private double max_acceleration;
+	private double max_deceleration;
 	private double max_velocity;
 
 	private double acceleration_dt;
 	private double cruise_dt;
 	private double deceleration_dt;
 
+	private double acceleration_dist;
+
 	private double target;
 
 	private final ElapsedTime elapsedTime = new ElapsedTime();
 
-	MotionProfile(double max_acceleration, double max_deceleration, double max_velocity) {
-		this.max_acceleration = max_acceleration;
-		this.max_deceleration = max_deceleration;
-		this.max_velocity = max_velocity;
-	}
+	public MotionProfile() {}
 
 	public void setTarget(double target) {
 		this.target = target;
 	}
 
-	public void init() {
+	public void init(double max_acc, double max_dec, double max_vel) {
+		max_acceleration = max_acc;
+		max_deceleration = max_dec;
+		max_velocity = max_vel;
+
 		acceleration_dt = max_velocity / max_acceleration;
 
 		double halfway_distance = target / 2;
-		double acceleration_dist = 0.5 * max_acceleration * acceleration_dt * acceleration_dt;
+		acceleration_dist = 0.5 * max_acceleration * acceleration_dt * acceleration_dt;
 
 		if (acceleration_dist > halfway_distance) {
 			acceleration_dt = Math.sqrt(halfway_distance / (0.5 * max_acceleration));
@@ -61,7 +63,6 @@ public class MotionProfile {
 
 		} else if (dt < acceleration_dt + cruise_dt) {
 			// cruising
-			double acceleration_dist = 0.5 * max_acceleration * acceleration_dt * acceleration_dt;
 			double cruise_current_dt = dt - acceleration_dt;
 
 			return acceleration_dist + max_velocity * cruise_current_dt;

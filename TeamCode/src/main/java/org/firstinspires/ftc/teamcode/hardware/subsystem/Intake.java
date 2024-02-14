@@ -4,14 +4,16 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
-import org.firstinspires.ftc.teamcode.hardware.optimised.OptimisedMotor;
-import org.firstinspires.ftc.teamcode.hardware.optimised.OptimisedServo;
-import org.firstinspires.ftc.teamcode.util.IRBreakBeam;
+import org.firstinspires.ftc.teamcode.hardware.common.LimitSwitch;
+import org.firstinspires.ftc.teamcode.hardware.common.OptimisedMotor;
+import org.firstinspires.ftc.teamcode.hardware.common.OptimisedServo;
+import org.firstinspires.ftc.teamcode.hardware.common.IRBreakBeam;
 
 public class Intake {
 
 	private OptimisedServo angle;
 	private OptimisedMotor horizontalExtension;
+	private LimitSwitch limitSwitch;
 	private OptimisedMotor spinners;
 	private IRBreakBeam leftBeam;
 	private IRBreakBeam rightBeam;
@@ -21,25 +23,39 @@ public class Intake {
 	private IntakeStates.Spinners spinnersState = IntakeStates.Spinners.CHILL;
 
 	public void init(HardwareMap hwMap) {
+		angle.setName("intakeAngle", hwMap);
+		angle.setPosition(angleState.getPos());
+
 		horizontalExtension.setName("intakeHorizontalExtension", hwMap);
 		horizontalExtension.setDirection(DcMotorSimple.Direction.FORWARD);
 		horizontalExtension.setZeroPowerBehaviour(DcMotor.ZeroPowerBehavior.BRAKE);
 		horizontalExtension.setPower(0.0);
+
+		limitSwitch.setName("intakeLimitSwitch", hwMap);
 
 		spinners.setName("intakeSpinners", hwMap);
 		spinners.setDirection(DcMotorSimple.Direction.FORWARD);
 		spinners.setZeroPowerBehaviour(DcMotor.ZeroPowerBehavior.BRAKE);
 		spinners.setPower(spinnersState.getPower());
 
-		angle.setName("intakeAngle", hwMap);
-		angle.setPosition(angleState.getPos());
-
 		leftBeam.setName("intakeLeftBeam", hwMap);
 		rightBeam.setName("intakeRightBeam", hwMap);
 	}
 
-	class HorizontalExtension extends MotionProfileMovement {
+	public void angleToCollect() {
+		angleState = IntakeStates.Angle.COLLECT;
+	}
 
+	public void angleToTransfer() {
+		angleState = IntakeStates.Angle.TRANSFER;
+	}
+
+	public void slidersRetract() {
+		extensionState = IntakeStates.Extension.IN;
+	}
+
+	public void slidersExtend() {
+		extensionState = IntakeStates.Extension.OUT;
 	}
 
 	public void spinInwards() {
@@ -54,21 +70,16 @@ public class Intake {
 		spinnersState = IntakeStates.Spinners.CHILL;
 	}
 
-	public void angleToCollect() {
-		angleState = IntakeStates.Angle.COLLECT;
-	}
-
-	public void angleToTransfer() {
-		angleState = IntakeStates.Angle.TRANSFER;
-	}
-
 	public void update() {
 		if (leftBeam.isBroken() && rightBeam.isBroken() && angleState == IntakeStates.Angle.COLLECT) {
 			angleState = IntakeStates.Angle.TRANSFER;
 		}
 
-		spinners.setPower(spinnersState.getPower());
 		angle.setPosition(angleState.getPos());
+
+
+
+		spinners.setPower(spinnersState.getPower());
 	}
 
 }
