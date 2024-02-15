@@ -41,10 +41,10 @@ public class MotionProfile {
 
 		max_velocity = max_acceleration * acceleration_dt;
 
+		deceleration_dist = Kinematics.distFromAccelAndTime(half_dist, -max_deceleration);
+
 		cruise_dist = target_dist - 2 * acceleration_dist; // TODO
 		cruise_dt = cruise_dist / max_velocity;
-
-		deceleration_dt = acceleration_dt;
 
 		total_dt = acceleration_dt + cruise_dt + deceleration_dt;
 	}
