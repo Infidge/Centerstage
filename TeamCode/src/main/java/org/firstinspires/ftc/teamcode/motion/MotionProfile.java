@@ -2,6 +2,8 @@ package org.firstinspires.ftc.teamcode.motion;
 
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.teamcode.util.Kinematics;
+
 public class MotionProfile {
 
 	private double max_acceleration;
@@ -11,71 +13,67 @@ public class MotionProfile {
 	private double acceleration_dt;
 	private double cruise_dt;
 	private double deceleration_dt;
+	private double total_dt;
 
 	private double acceleration_dist;
+	private double cruise_dist;
 
-	private double target;
+	private double target_dist;
 
 	private final ElapsedTime elapsedTime = new ElapsedTime();
 
-	public MotionProfile() {}
-
-	public void setTarget(double target) {
-		this.target = target;
-	}
-
-	public void init(double max_acc, double max_dec, double max_vel) {
+	public MotionProfile(double max_acc, double max_dec, double max_vel) {
 		max_acceleration = max_acc;
 		max_deceleration = max_dec;
 		max_velocity = max_vel;
+	}
 
+	public void init() {
 		acceleration_dt = max_velocity / max_acceleration;
 
-		double halfway_distance = target / 2;
-		acceleration_dist = 0.5 * max_acceleration * acceleration_dt * acceleration_dt;
+		double half_dist = target_dist / 2;
+		acceleration_dist = Kinematics.distFromAccelAndTime(max_acceleration, acceleration_dt);
 
-		if (acceleration_dist > halfway_distance) {
-			acceleration_dt = Math.sqrt(halfway_distance / (0.5 * max_acceleration));
-			acceleration_dist = 0.5 * max_acceleration * acceleration_dt * acceleration_dt;
+		if (acceleration_dist > half_dist) {
+			acceleration_dt = Kinematics.timeFromDistAndAcc(half_dist, max_acceleration);
+			acceleration_dist = Kinematics.distFromAccelAndTime(max_acceleration, acceleration_dt);
 		}
 
 		max_velocity = max_acceleration * acceleration_dt;
 
-		double cruise_dist = target - 2 * acceleration_dist;
+		cruise_dist = target_dist - 2 * acceleration_dist; // TODO
 		cruise_dt = cruise_dist / max_velocity;
 
 		deceleration_dt = acceleration_dt;
 
+		total_dt = acceleration_dt + cruise_dt + deceleration_dt;
+	}
+
+	public void start(double target) {
+		target_dist = target;
 		elapsedTime.reset();
 	}
 
 	public double update() {
-		double entire_dt = acceleration_dt + cruise_dt + deceleration_dt;
 		double dt = elapsedTime.seconds();
 
-		if (dt > entire_dt) {
-			// finished the motion profile
-			return target;
+		if (dt >= total_dt) { // finished the motion profile
+			return target_dist;
 
-		} else if (dt < acceleration_dt) {
-			// accelerating
-			return 0.5 * max_acceleration * dt * dt;
+		} else if (dt < acceleration_dt) { // accelerating
+			return Kinematics.distFromAccelAndTime(max_acceleration, dt);
 
-		} else if (dt < acceleration_dt + cruise_dt) {
-			// cruising
+		} else if (dt < acceleration_dt + cruise_dt) { // cruising
 			double cruise_current_dt = dt - acceleration_dt;
+			double cruise_current_dist = max_velocity * cruise_current_dt;
 
-			return acceleration_dist + max_velocity * cruise_current_dt;
+			return acceleration_dist + cruise_current_dist;
 
-		} else {
-			// decelerating
-			double acceleration_dist = 0.5 * max_acceleration * acceleration_dt * acceleration_dt;
-			double cruise_dist = max_velocity * cruise_dt;
-			double deceleration_current_time = dt - acceleration_dt - cruise_dt;
+		} else { // decelerating
+			double deceleration_current_dt = dt - acceleration_dt - cruise_dt;
 
-			return acceleration_dist + cruise_dist + max_velocity * deceleration_current_time - 0.5 * max_acceleration * deceleration_current_time * deceleration_current_time;
+			return acceleration_dist + cruise_dist + Kinematics.distFromVelAccelAndTime(-max_acceleration, max_velocity, deceleration_current_dt);
 		}
-
 	}
 
 }
