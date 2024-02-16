@@ -27,6 +27,10 @@ public class MotionProfile {
 		max_velocity = max_vel;
 	}
 
+	public double getTarget() {
+		return target_dist;
+	}
+
 	public void start(double target) {
 		target_dist = target;
 

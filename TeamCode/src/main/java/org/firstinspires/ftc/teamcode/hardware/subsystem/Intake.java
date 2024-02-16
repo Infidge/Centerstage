@@ -14,23 +14,25 @@ import org.firstinspires.ftc.teamcode.util.constants.IntakeConstants;
 
 public class Intake {
 
-	private OptimisedServo angle;
-	private OptimisedServo pixelCover;
-	private OptimisedMotor spinners;
+	private final OptimisedServo angle = new OptimisedServo();
+	private final OptimisedServo pixelCover = new OptimisedServo();
+	private final OptimisedMotor spinners = new OptimisedMotor();
 
-	private OptimisedMotor horizontalExtension;
-	private LimitSwitch limitSwitch;
+	private final OptimisedMotor horizontalExtension = new OptimisedMotor();
+	private final LimitSwitch limitSwitch = new LimitSwitch();
 
-	private IRBreakBeam leftBeam;
-	private IRBreakBeam rightBeam;
+	private final IRBreakBeam leftBeam = new IRBreakBeam();
+	private final IRBreakBeam rightBeam = new IRBreakBeam();
 
 	private IntakeStates.Angle angleState = IntakeStates.Angle.TRANSFER;
-	private IntakeStates.Extension extensionState = IntakeStates.Extension.IN;
 	private IntakeStates.PixelCover pixelCoverState = IntakeStates.PixelCover.LOWERED;
 	private IntakeStates.Spinners spinnersState = IntakeStates.Spinners.CHILL;
 
+	private IntakeStates.Extension extensionState = IntakeStates.Extension.IN;
+	private IntakeStates.Extension lastExtensionState = extensionState;
 	private final PDFController extensionPdfController = new PDFController(IntakeConstants.EXTENSION_P, IntakeConstants.EXTENSION_D, IntakeConstants.EXTENSION_F);
 	private final MotionProfile extensionMotionProfile = new MotionProfile(IntakeConstants.EXTENSION_MAX_ACC, IntakeConstants.EXTENSION_MAX_DEC, IntakeConstants.EXTENSION_MAX_VEL);
+	private boolean extensionMotionFinished = true;
 
 	public void init(HardwareMap hwMap) {
 		angle.setName("intakeAngle", hwMap);
@@ -100,9 +102,22 @@ public class Intake {
 		pixelCover.setPosition(pixelCoverState.getPos());
 		spinners.setPower(spinnersState.getPower());
 
-		int instantTargetPosition = (int) extensionMotionProfile.update();
-		double horizontalExtensionPower = extensionPdfController.update(instantTargetPosition, horizontalExtension.motor.getCurrentPosition());
-		horizontalExtension.setPower(horizontalExtensionPower);
+		if (extensionState != lastExtensionState) {
+			extensionMotionProfile.start(extensionState.getPos());
+			extensionMotionFinished = false;
+			lastExtensionState = extensionState;
+		}
+
+		if (!extensionMotionFinished) {
+			int extensionInstantPos = (int) extensionMotionProfile.update();
+
+			if (extensionInstantPos == extensionMotionProfile.getTarget()) {
+				extensionMotionFinished = true;
+			} else {
+				double extensionPower = extensionPdfController.update(extensionInstantPos, horizontalExtension.motor.getCurrentPosition());
+				horizontalExtension.setPower(extensionPower);
+			}
+		}
 	}
 
 }
