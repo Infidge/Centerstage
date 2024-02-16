@@ -5,8 +5,8 @@ import org.firstinspires.ftc.teamcode.util.constants.IntakeConstants;
 class IntakeStates {
 
 	enum Angle {
-		COLLECT(IntakeConstants.ANGLE_COLLECT_POS),
-		TRANSFER(IntakeConstants.ANGLE_TRANSFER_POS);
+		COLLECT(IntakeConstants.ANGLE_COLLECT),
+		TRANSFER(IntakeConstants.ANGLE_TRANSFER);
 
 		private final double val;
 
@@ -21,7 +21,7 @@ class IntakeStates {
 
 	enum Extension {
 		IN(0),
-		OUT(IntakeConstants.EXTENSION_OUT_POS);
+		OUT(IntakeConstants.EXTENSION_OUT);
 
 		private final int val;
 
@@ -35,8 +35,8 @@ class IntakeStates {
 	}
 
 	enum PixelCover {
-		LOWERED(IntakeConstants.PIXEL_COVER_LOWERED_POS),
-		RAISED(IntakeConstants.PIXEL_COVER_RAISED_POS);
+		LOWERED(IntakeConstants.PIXEL_COVER_LOWERED),
+		RAISED(IntakeConstants.PIXEL_COVER_RAISED);
 
 		private final double val;
 

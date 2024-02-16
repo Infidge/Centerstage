@@ -69,7 +69,7 @@ public class Drivetrain {
 		double turn = gamepad.right_trigger - gamepad.left_trigger;
 		double heading = 0.0;
 
-		/** Heading PDF */
+		/* Heading PDF */
 		if (turn == 0) {
 			heading = imu.getAngularOrientation().firstAngle;
 			headingControl = true;
@@ -81,7 +81,7 @@ public class Drivetrain {
 		if (headingControl)
 			turn += headingPDF.update(targetHeading, heading);
 
-		/** Mecanum kinematics */
+		/* Mecanum kinematics */
 		double flPower = drive + strafe + turn;
 		double rlPower = drive - strafe + turn;
 		double rrPower = drive + strafe - turn;
@@ -103,7 +103,7 @@ public class Drivetrain {
 	private void powerRegulation (double power1, double power2, double power3, double power4) {
 		double max = Math.max(Math.abs(power1), Math.max(Math.abs(power2), Math.max(Math.abs(power3), Math.abs(power4))));
 
-		/** Power wrapping */
+		/* Power wrapping */
 		if (max > 1.0) {
 			power1 /= max;
 			power2 /= max;
@@ -111,7 +111,7 @@ public class Drivetrain {
 			power4 /= max;
 		}
 
-		/** Voltage correction */
+		/* Voltage correction */
 		power1 *= 12.0 / voltageRegulator.getInputVoltage(VoltageUnit.VOLTS);
 		power2 *= 12.0 / voltageRegulator.getInputVoltage(VoltageUnit.VOLTS);
 		power3 *= 12.0 / voltageRegulator.getInputVoltage(VoltageUnit.VOLTS);

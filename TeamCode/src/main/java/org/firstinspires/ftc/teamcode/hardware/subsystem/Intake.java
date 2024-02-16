@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.teamcode.hardware.common.LimitSwitch;
 import org.firstinspires.ftc.teamcode.hardware.common.OptimisedMotor;
 import org.firstinspires.ftc.teamcode.hardware.common.OptimisedServo;
-import org.firstinspires.ftc.teamcode.hardware.common.IRBreakBeam;
+import org.firstinspires.ftc.teamcode.hardware.common.BreakBeam;
 import org.firstinspires.ftc.teamcode.motion.MotionProfile;
 import org.firstinspires.ftc.teamcode.pidf.PDFController;
 import org.firstinspires.ftc.teamcode.util.constants.IntakeConstants;
@@ -21,8 +21,8 @@ public class Intake {
 	private final OptimisedMotor horizontalExtension = new OptimisedMotor();
 	private final LimitSwitch limitSwitch = new LimitSwitch();
 
-	private final IRBreakBeam leftBeam = new IRBreakBeam();
-	private final IRBreakBeam rightBeam = new IRBreakBeam();
+	private final BreakBeam leftBeam = new BreakBeam();
+	private final BreakBeam rightBeam = new BreakBeam();
 
 	private IntakeStates.Angle angleState = IntakeStates.Angle.TRANSFER;
 	private IntakeStates.PixelCover pixelCoverState = IntakeStates.PixelCover.LOWERED;
@@ -33,6 +33,8 @@ public class Intake {
 	private final PDFController extensionPdfController = new PDFController(IntakeConstants.EXTENSION_P, IntakeConstants.EXTENSION_D, IntakeConstants.EXTENSION_F);
 	private final MotionProfile extensionMotionProfile = new MotionProfile(IntakeConstants.EXTENSION_MAX_ACC, IntakeConstants.EXTENSION_MAX_DEC, IntakeConstants.EXTENSION_MAX_VEL);
 	private boolean extensionMotionFinished = true;
+
+	public Intake() {}
 
 	public void init(HardwareMap hwMap) {
 		angle.setName("intakeAngle", hwMap);
@@ -55,6 +57,33 @@ public class Intake {
 
 		leftBeam.setName("intakeLeftBeam", hwMap);
 		rightBeam.setName("intakeRightBeam", hwMap);
+	}
+
+	public void update() {
+		if (leftBeam.isBroken() && rightBeam.isBroken() && angleState == IntakeStates.Angle.COLLECT) {
+			angleState = IntakeStates.Angle.TRANSFER;
+		}
+
+		angle.setPosition(angleState.getPos());
+		pixelCover.setPosition(pixelCoverState.getPos());
+		spinners.setPower(spinnersState.getPower());
+
+		if (extensionState != lastExtensionState) {
+			extensionMotionProfile.start(extensionState.getPos());
+			extensionMotionFinished = false;
+			lastExtensionState = extensionState;
+		}
+
+		if (!extensionMotionFinished) {
+			int extensionInstantPos = (int) extensionMotionProfile.update();
+
+			if (extensionInstantPos == extensionMotionProfile.getTarget()) {
+				extensionMotionFinished = true;
+			} else {
+				double extensionPower = extensionPdfController.update(extensionInstantPos, horizontalExtension.motor.getCurrentPosition());
+				horizontalExtension.setPower(extensionPower);
+			}
+		}
 	}
 
 	public void angleToCollect() {
@@ -91,33 +120,6 @@ public class Intake {
 
 	public void slidersExtend() {
 		extensionState = IntakeStates.Extension.OUT;
-	}
-
-	public void update() {
-		if (leftBeam.isBroken() && rightBeam.isBroken() && angleState == IntakeStates.Angle.COLLECT) {
-			angleState = IntakeStates.Angle.TRANSFER;
-		}
-
-		angle.setPosition(angleState.getPos());
-		pixelCover.setPosition(pixelCoverState.getPos());
-		spinners.setPower(spinnersState.getPower());
-
-		if (extensionState != lastExtensionState) {
-			extensionMotionProfile.start(extensionState.getPos());
-			extensionMotionFinished = false;
-			lastExtensionState = extensionState;
-		}
-
-		if (!extensionMotionFinished) {
-			int extensionInstantPos = (int) extensionMotionProfile.update();
-
-			if (extensionInstantPos == extensionMotionProfile.getTarget()) {
-				extensionMotionFinished = true;
-			} else {
-				double extensionPower = extensionPdfController.update(extensionInstantPos, horizontalExtension.motor.getCurrentPosition());
-				horizontalExtension.setPower(extensionPower);
-			}
-		}
 	}
 
 }

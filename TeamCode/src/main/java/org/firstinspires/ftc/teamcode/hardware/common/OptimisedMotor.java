@@ -20,7 +20,7 @@ public class OptimisedMotor {
         this.motor = hwMap.get(DcMotorEx.class, name);
     }
 
-    public void setPower(Double power) {
+    public void setPower(double power) {
         if (Math.abs(lastPower - power) > EPSILON) {
             this.motor.setPower(power);
             this.lastPower = power;

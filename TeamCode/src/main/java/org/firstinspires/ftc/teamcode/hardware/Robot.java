@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.hardware;
 
+import com.qualcomm.robotcore.hardware.HardwareMap;
+
 import org.firstinspires.ftc.teamcode.hardware.subsystem.Claw;
 import org.firstinspires.ftc.teamcode.hardware.subsystem.Drivetrain;
 import org.firstinspires.ftc.teamcode.hardware.subsystem.Intake;
@@ -12,16 +14,16 @@ public class Robot {
 
 	public final Drivetrain drivetrain;
 	public final Intake intake;
+	public final Claw claw;
 	public final Lift lift;
 	public final V4B v4b;
-	public final Claw claw;
 
 	private Robot()	{
 		drivetrain = new Drivetrain();
 		intake = new Intake();
+		claw = new Claw();
 		lift = new Lift();
 		v4b = new V4B();
-		claw = new Claw();
 	}
 
 	public static Robot getInstance() {
@@ -31,8 +33,16 @@ public class Robot {
 		return instance;
 	}
 
+	public void init(HardwareMap hwMap) {
+		intake.init(hwMap);
+		claw.init(hwMap);
+		v4b.init(hwMap);
+	}
+
 	public void update() {
 		intake.update();
+		claw.update();
+		v4b.update();
 	}
 
 }

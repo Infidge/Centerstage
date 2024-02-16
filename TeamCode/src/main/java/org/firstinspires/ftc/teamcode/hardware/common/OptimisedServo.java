@@ -16,7 +16,7 @@ public class OptimisedServo {
         this.servo = hwMap.get(Servo.class, name);
     }
 
-    public void setPosition(Double position) {
+    public void setPosition(double position) {
         if (Math.abs(lastPosition - position) > EPSILON) {
             this.servo.setPosition(position);
             this.lastPosition = position;
