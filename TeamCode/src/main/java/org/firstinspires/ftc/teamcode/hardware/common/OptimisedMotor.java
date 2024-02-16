@@ -9,7 +9,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 
 public class OptimisedMotor {
 
-    private DcMotorEx motor;
+    public DcMotorEx motor;
 
     private double lastPower = 2.0;
     private static final double EPSILON = 0.01;

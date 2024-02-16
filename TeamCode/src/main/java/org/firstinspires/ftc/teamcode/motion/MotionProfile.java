@@ -6,18 +6,16 @@ import org.firstinspires.ftc.teamcode.util.Kinematics;
 
 public class MotionProfile {
 
-	private double max_acceleration;
-	private double max_deceleration;
+	private final double max_acceleration;
+	private final double max_deceleration;
 	private double max_velocity;
 
 	private double acceleration_dt;
 	private double cruise_dt;
-	private double deceleration_dt;
 	private double total_dt;
 
 	private double acceleration_dist;
 	private double cruise_dist;
-	private double deceleration_dist;
 
 	private double target_dist;
 
@@ -29,53 +27,57 @@ public class MotionProfile {
 		max_velocity = max_vel;
 	}
 
-	public void init() {
+	public void start(double target) {
+		target_dist = target;
+
 		acceleration_dt = max_velocity / max_acceleration;
-		deceleration_dt = max_velocity / max_deceleration;
+		double deceleration_dt = max_velocity / max_deceleration;
 
 		acceleration_dist = Kinematics.distFromAccelAndTime(max_acceleration, acceleration_dt);
-		deceleration_dist = Kinematics.distFromAccelAndTime(max_deceleration, deceleration_dt);
+		double deceleration_dist = Kinematics.distFromAccelAndTime(max_deceleration, deceleration_dt);
 
 		if (acceleration_dist + deceleration_dist > target_dist) {
-			acceleration_dt = target_dist * acceleration_dt / (acceleration_dt + deceleration_dt);
-			deceleration_dt = target_dist * deceleration_dt / (acceleration_dt + deceleration_dt);
+			acceleration_dist = target_dist * acceleration_dist / (acceleration_dist + deceleration_dist);
+			deceleration_dist = target_dist * deceleration_dist / (acceleration_dist + deceleration_dist);
 
-			acceleration_dist = Kinematics.distFromAccelAndTime(max_acceleration, acceleration_dt);
-			deceleration_dist = Kinematics.distFromAccelAndTime(max_deceleration, deceleration_dt);
+			acceleration_dt = Kinematics.timeFromDistAndAcc(acceleration_dist, max_acceleration);
+			deceleration_dt = Kinematics.timeFromDistAndAcc(deceleration_dist, max_deceleration);
 		}
 
-		max_velocity = max_acceleration * acceleration_dt; // ?
+		max_velocity = max_acceleration * acceleration_dt;
 
 		cruise_dist = target_dist - acceleration_dist - deceleration_dist;
 		cruise_dt = cruise_dist / max_velocity;
 
 		total_dt = acceleration_dt + cruise_dt + deceleration_dt;
-	}
 
-	public void start(double target) {
-		target_dist = target;
 		elapsedTime.reset();
 	}
 
 	public double update() {
 		double dt = elapsedTime.seconds();
 
-		if (dt >= total_dt) { // finished the motion profile
+		if (dt >= total_dt) {
+			// finished the motion profile
 			return target_dist;
 
-		} else if (dt < acceleration_dt) { // accelerating
+		} else if (dt < acceleration_dt) {
+			// accelerating
 			return Kinematics.distFromAccelAndTime(max_acceleration, dt);
 
-		} else if (dt < acceleration_dt + cruise_dt) { // cruising
+		} else if (dt < acceleration_dt + cruise_dt) {
+			// cruising
 			double cruise_current_dt = dt - acceleration_dt;
 			double cruise_current_dist = max_velocity * cruise_current_dt;
 
 			return acceleration_dist + cruise_current_dist;
 
-		} else { // decelerating
+		} else {
+			// decelerating
 			double deceleration_current_dt = dt - acceleration_dt - cruise_dt;
+			double deceleration_current_dist = Kinematics.distFromVelAccelAndTime(max_velocity, -max_deceleration, deceleration_current_dt);
 
-			return acceleration_dist + cruise_dist + Kinematics.distFromVelAccelAndTime(max_velocity, -max_deceleration, deceleration_current_dt);
+			return acceleration_dist + cruise_dist + deceleration_current_dist;
 		}
 	}
 

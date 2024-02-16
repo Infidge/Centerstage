@@ -53,8 +53,6 @@ public class Intake {
 
 		leftBeam.setName("intakeLeftBeam", hwMap);
 		rightBeam.setName("intakeRightBeam", hwMap);
-
-		extensionMotionProfile.init();
 	}
 
 	public void angleToCollect() {
@@ -101,6 +99,10 @@ public class Intake {
 		angle.setPosition(angleState.getPos());
 		pixelCover.setPosition(pixelCoverState.getPos());
 		spinners.setPower(spinnersState.getPower());
+
+		int instantTargetPosition = (int) extensionMotionProfile.update();
+		double horizontalExtensionPower = extensionPdfController.update(instantTargetPosition, horizontalExtension.motor.getCurrentPosition());
+		horizontalExtension.setPower(horizontalExtensionPower);
 	}
 
 }
