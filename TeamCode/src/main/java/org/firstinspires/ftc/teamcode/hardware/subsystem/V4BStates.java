@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode.hardware.subsystem;
 
-import org.firstinspires.ftc.teamcode.util.constants.IntakeConstants;
-import org.firstinspires.ftc.teamcode.util.constants.V4BConstants;
+import org.firstinspires.ftc.teamcode.hardware.subsystem.constants.V4BConstants;
 
 public class V4BStates {
 

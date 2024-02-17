@@ -34,14 +34,17 @@ public class Robot {
 	}
 
 	public void init(HardwareMap hwMap) {
+		drivetrain.init(hwMap);
 		intake.init(hwMap);
 		claw.init(hwMap);
+		lift.init(hwMap);
 		v4b.init(hwMap);
 	}
 
 	public void update() {
 		intake.update();
 		claw.update();
+		lift.update();
 		v4b.update();
 	}
 

@@ -10,8 +10,8 @@ public class V4B {
     private final OptimisedServo armAngleRight = new OptimisedServo();
     private final OptimisedServo clawAngle = new OptimisedServo();
 
-    private V4BStates.ArmAngle armAngleState = V4BStates.ArmAngle.TRANSFER;
-    private V4BStates.ClawAngle clawAngleState = V4BStates.ClawAngle.TRANSFER;
+    private V4BStates.ArmAngle armAngleState = V4BStates.ArmAngle.DEPOSIT;
+    private V4BStates.ClawAngle clawAngleState = V4BStates.ClawAngle.DEPOSIT;
 
     public V4B() {}
 
@@ -30,6 +30,11 @@ public class V4B {
         armAngleLeft.setPosition(armAngleState.getLeftPos());
         armAngleRight.setPosition(armAngleState.getRightPos());
         clawAngle.setPosition(clawAngleState.getPos());
+    }
+
+    public boolean isInTransferPosition() {
+        return armAngleState == V4BStates.ArmAngle.TRANSFER
+                && clawAngleState == V4BStates.ClawAngle.TRANSFER;
     }
 
     public void toTransferPosition() {

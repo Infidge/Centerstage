@@ -1,31 +1,16 @@
 package org.firstinspires.ftc.teamcode.hardware.subsystem;
 
-import org.firstinspires.ftc.teamcode.util.constants.IntakeConstants;
+import org.firstinspires.ftc.teamcode.hardware.subsystem.constants.IntakeConstants;
 
 class IntakeStates {
 
 	enum Angle {
-		COLLECT(IntakeConstants.ANGLE_COLLECT),
-		TRANSFER(IntakeConstants.ANGLE_TRANSFER);
+		LOWERED(IntakeConstants.ANGLE_LOWERED),
+		RAISED(IntakeConstants.ANGLE_RAISED);
 
 		private final double val;
 
 		Angle(double val) {
-			this.val = val;
-		}
-
-		double getPos() {
-			return val;
-		}
-	}
-
-	enum Extension {
-		IN(0),
-		OUT(IntakeConstants.EXTENSION_OUT);
-
-		private final int val;
-
-		Extension(int val) {
 			this.val = val;
 		}
 
@@ -49,8 +34,23 @@ class IntakeStates {
 		}
 	}
 
+	enum Sliders {
+		RETRACTED(0),
+		EXTENDED(IntakeConstants.SLIDERS_EXTENDED);
+
+		private final int val;
+
+		Sliders(int val) {
+			this.val = val;
+		}
+
+		double getPos() {
+			return val;
+		}
+	}
+
 	enum Spinners {
-		CHILL(0.0),
+		STOP(0.0),
 		IN(IntakeConstants.SPINNERS_IN_POWER),
 		OUT(IntakeConstants.SPINNERS_OUT_POWER),
 		TRANSFER(IntakeConstants.SPINNERS_TRANSFER_POWER);

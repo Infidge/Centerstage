@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.util.constants;
+package org.firstinspires.ftc.teamcode.hardware.subsystem.constants;
 
 public class ClawConstants {
 

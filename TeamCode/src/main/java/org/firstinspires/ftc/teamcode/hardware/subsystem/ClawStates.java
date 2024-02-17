@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode.hardware.subsystem;
 
-import org.firstinspires.ftc.teamcode.util.constants.ClawConstants;
-import org.firstinspires.ftc.teamcode.util.constants.IntakeConstants;
+import org.firstinspires.ftc.teamcode.hardware.subsystem.constants.ClawConstants;
 
 public class ClawStates {
 

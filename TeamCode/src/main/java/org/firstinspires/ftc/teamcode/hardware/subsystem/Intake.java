@@ -6,33 +6,36 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.teamcode.hardware.common.LimitSwitch;
 import org.firstinspires.ftc.teamcode.hardware.common.OptimisedMotor;
+import org.firstinspires.ftc.teamcode.hardware.common.OptimisedMotorByBaciu;
 import org.firstinspires.ftc.teamcode.hardware.common.OptimisedServo;
 import org.firstinspires.ftc.teamcode.hardware.common.BreakBeam;
 import org.firstinspires.ftc.teamcode.motion.MotionProfile;
 import org.firstinspires.ftc.teamcode.pidf.PDFController;
-import org.firstinspires.ftc.teamcode.util.constants.IntakeConstants;
+import org.firstinspires.ftc.teamcode.hardware.subsystem.constants.IntakeConstants;
 
 public class Intake {
 
 	private final OptimisedServo angle = new OptimisedServo();
 	private final OptimisedServo pixelCover = new OptimisedServo();
-	private final OptimisedMotor spinners = new OptimisedMotor();
+	private final OptimisedMotor sliders = new OptimisedMotor();
+	private OptimisedMotorByBaciu spinners;
 
-	private final OptimisedMotor horizontalExtension = new OptimisedMotor();
 	private final LimitSwitch limitSwitch = new LimitSwitch();
 
 	private final BreakBeam leftBeam = new BreakBeam();
 	private final BreakBeam rightBeam = new BreakBeam();
 
-	private IntakeStates.Angle angleState = IntakeStates.Angle.TRANSFER;
+	private IntakeStates.Angle angleState = IntakeStates.Angle.LOWERED;
 	private IntakeStates.PixelCover pixelCoverState = IntakeStates.PixelCover.LOWERED;
-	private IntakeStates.Spinners spinnersState = IntakeStates.Spinners.CHILL;
+	private IntakeStates.Spinners spinnersState = IntakeStates.Spinners.STOP;
 
-	private IntakeStates.Extension extensionState = IntakeStates.Extension.IN;
-	private IntakeStates.Extension lastExtensionState = extensionState;
-	private final PDFController extensionPdfController = new PDFController(IntakeConstants.EXTENSION_P, IntakeConstants.EXTENSION_D, IntakeConstants.EXTENSION_F);
-	private final MotionProfile extensionMotionProfile = new MotionProfile(IntakeConstants.EXTENSION_MAX_ACC, IntakeConstants.EXTENSION_MAX_DEC, IntakeConstants.EXTENSION_MAX_VEL);
-	private boolean extensionMotionFinished = true;
+	private IntakeStates.Sliders slidersState = IntakeStates.Sliders.RETRACTED;
+	private IntakeStates.Sliders lastSlidersState = slidersState;
+	private final PDFController slidersPdfController = new PDFController(IntakeConstants.SLIDERS_P, IntakeConstants.SLIDERS_D, IntakeConstants.SLIDERS_F);
+	private final MotionProfile slidersMotionProfile = new MotionProfile(IntakeConstants.SLIDERS_MAX_ACC, IntakeConstants.SLIDERS_MAX_DEC, IntakeConstants.SLIDERS_MAX_VEL);
+	private boolean slidersMotionFinished = false;
+
+	private boolean pixelsIn = false;
 
 	public Intake() {}
 
@@ -43,15 +46,17 @@ public class Intake {
 		pixelCover.setName("intakePixelCover", hwMap);
 		pixelCover.setPosition(pixelCoverState.getPos());
 
-		spinners.setName("intakeSpinners", hwMap);
-		spinners.setDirection(DcMotorSimple.Direction.FORWARD);
-		spinners.setZeroPowerBehaviour(DcMotor.ZeroPowerBehavior.BRAKE);
-		spinners.setPower(spinnersState.getPower());
+		sliders.setName("intakeSliders", hwMap);
+		sliders.setDirection(DcMotorSimple.Direction.FORWARD);
+		sliders.setZeroPowerBehaviour(DcMotor.ZeroPowerBehavior.BRAKE);
+		sliders.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+		sliders.setPower(0.0);
 
-		horizontalExtension.setName("intakeHorizontalExtension", hwMap);
-		horizontalExtension.setDirection(DcMotorSimple.Direction.FORWARD);
-		horizontalExtension.setZeroPowerBehaviour(DcMotor.ZeroPowerBehavior.BRAKE);
-		horizontalExtension.setPower(0.0);
+		spinners = hwMap.get(OptimisedMotorByBaciu.class, "intakeSpinners");
+		spinners.setDirection(DcMotorSimple.Direction.FORWARD);
+		spinners.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+		spinners.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+		spinners.setPower(spinnersState.getPower());
 
 		limitSwitch.setName("intakeLimitSwitch", hwMap);
 
@@ -60,38 +65,45 @@ public class Intake {
 	}
 
 	public void update() {
-		if (leftBeam.isBroken() && rightBeam.isBroken() && angleState == IntakeStates.Angle.COLLECT) {
-			angleState = IntakeStates.Angle.TRANSFER;
+		if (leftBeam.isBroken() && rightBeam.isBroken()) {
+			angleRaise();
+			pixelCoverRaise();
 		}
+
+		pixelsIn = leftBeam.isBroken() && rightBeam.isBroken();
 
 		angle.setPosition(angleState.getPos());
 		pixelCover.setPosition(pixelCoverState.getPos());
 		spinners.setPower(spinnersState.getPower());
 
-		if (extensionState != lastExtensionState) {
-			extensionMotionProfile.start(extensionState.getPos());
-			extensionMotionFinished = false;
-			lastExtensionState = extensionState;
+		if (slidersState != lastSlidersState) {
+			slidersMotionProfile.start(slidersState.getPos());
+//			slidersMotionFinished = false;
+			lastSlidersState = slidersState;
 		}
 
-		if (!extensionMotionFinished) {
-			int extensionInstantPos = (int) extensionMotionProfile.update();
+		if (!slidersMotionFinished) {
+			int slidersInstantPosition = (int) slidersMotionProfile.getInstantPosition();
 
-			if (extensionInstantPos == extensionMotionProfile.getTarget()) {
-				extensionMotionFinished = true;
-			} else {
-				double extensionPower = extensionPdfController.update(extensionInstantPos, horizontalExtension.motor.getCurrentPosition());
-				horizontalExtension.setPower(extensionPower);
-			}
+//			if (slidersInstantPosition == slidersMotionProfile.getTargetPosition()) {
+//				slidersMotionFinished = true;
+//			}
+
+			double slidersPower = slidersPdfController.update(slidersInstantPosition, sliders.motor.getCurrentPosition());
+			sliders.setPower(slidersPower);
 		}
 	}
 
-	public void angleToCollect() {
-		angleState = IntakeStates.Angle.COLLECT;
+	public boolean arePixelsIn() {
+		return pixelsIn;
 	}
 
-	public void angleToTransfer() {
-		angleState = IntakeStates.Angle.TRANSFER;
+	public void angleLower() {
+		angleState = IntakeStates.Angle.LOWERED;
+	}
+
+	public void angleRaise() {
+		angleState = IntakeStates.Angle.RAISED;
 	}
 
 	public void pixelCoverLower() {
@@ -100,6 +112,14 @@ public class Intake {
 
 	public void pixelCoverRaise() {
 		pixelCoverState = IntakeStates.PixelCover.RAISED;
+	}
+
+	public void slidersRetract() {
+		slidersState = IntakeStates.Sliders.RETRACTED;
+	}
+
+	public void slidersExtend() {
+		slidersState = IntakeStates.Sliders.EXTENDED;
 	}
 
 	public void spinInwards() {
@@ -111,15 +131,7 @@ public class Intake {
 	}
 
 	public void spinStop() {
-		spinnersState = IntakeStates.Spinners.CHILL;
-	}
-
-	public void slidersRetract() {
-		extensionState = IntakeStates.Extension.IN;
-	}
-
-	public void slidersExtend() {
-		extensionState = IntakeStates.Extension.OUT;
+		spinnersState = IntakeStates.Spinners.STOP;
 	}
 
 }

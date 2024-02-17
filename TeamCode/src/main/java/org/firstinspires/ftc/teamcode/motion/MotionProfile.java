@@ -27,7 +27,7 @@ public class MotionProfile {
 		max_velocity = max_vel;
 	}
 
-	public double getTarget() {
+	public double getTargetPosition() {
 		return target_dist;
 	}
 
@@ -58,7 +58,7 @@ public class MotionProfile {
 		elapsedTime.reset();
 	}
 
-	public double update() {
+	public double getInstantPosition() {
 		double dt = elapsedTime.seconds();
 
 		if (dt >= total_dt) {
