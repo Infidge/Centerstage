@@ -39,13 +39,7 @@ public class TeleOp extends LinearOpMode {
 			if (gamepad1.right_bumper) {
 				robot.intake.spinInwards();
 				robot.intake.angleLower();
-
-				if (robot.v4b.isInTransferPosition()) {
-					gamepad1.runRumbleEffect(errorRumbleEffect);
-				} else {
-					robot.intake.pixelCoverLower();
-				}
-
+				robot.intake.pixelCoverLower();
 			} else if (gamepad1.left_bumper) {
 				robot.intake.spinOutwards();
 			} else {

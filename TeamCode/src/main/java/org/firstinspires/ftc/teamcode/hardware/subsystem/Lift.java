@@ -12,7 +12,9 @@ import org.firstinspires.ftc.teamcode.pidf.PDFController;
 
 public class Lift {
 
-    private final OptimisedMotor motor = new OptimisedMotor();
+    private final OptimisedMotor motor1 = new OptimisedMotor();
+    private final OptimisedMotor motor2 = new OptimisedMotor();
+
     private final LimitSwitch limitSwitch = new LimitSwitch();
 
     private enum LiftState {
@@ -28,11 +30,17 @@ public class Lift {
     private int pixelLevel = LiftConstants.PIXEL_LEVEL_MIN;
 
     public void init(HardwareMap hwMap) {
-        motor.setName("liftMotor", hwMap);
-        motor.setDirection(DcMotorSimple.Direction.FORWARD);
-        motor.setZeroPowerBehaviour(DcMotor.ZeroPowerBehavior.BRAKE);
-        motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        motor.setPower(0.0);
+        motor1.setName("liftMotorEncoder", hwMap);
+        motor1.setDirection(DcMotorSimple.Direction.FORWARD);
+        motor1.setZeroPowerBehaviour(DcMotor.ZeroPowerBehavior.BRAKE);
+        motor1.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        motor1.setPower(0.0);
+
+        motor2.setName("liftMotor", hwMap);
+        motor2.setDirection(DcMotorSimple.Direction.FORWARD);
+        motor2.setZeroPowerBehaviour(DcMotor.ZeroPowerBehavior.BRAKE);
+        motor2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        motor2.setPower(0.0);
 
         limitSwitch.setName("liftLimitSwitch", hwMap);
     }
@@ -41,18 +49,23 @@ public class Lift {
         if (state == LiftState.LOWER) {
             if (limitSwitch.isPressed()) {
                 state = LiftState.STOP;
-                motor.setPower(0.0);
-                motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-                motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                motor1.setPower(0.0);
+                motor2.setPower(0.0);
+                motor1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                motor2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                motor1.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                motor2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
             } else {
-                motor.setPower(LiftConstants.LOWER_POWER);
+                motor1.setPower(LiftConstants.LOWER_POWER);
+                motor2.setPower(LiftConstants.LOWER_POWER);
             }
         } else if (state == LiftState.RAISE) {
             pixelLevel = Range.clip(pixelLevel, LiftConstants.PIXEL_LEVEL_MIN, LiftConstants.PIXEL_LEVEL_MAX);
 
             int targetPosition = LiftConstants.PIXEL_LEVEL_BASE + LiftConstants.PIXEL_LEVEL_INCREMENT * pixelLevel;
-            int power = pdfController.update(targetPosition, motor.motor.getCurrentPosition());
-            motor.setPower(power);
+            int power = pdfController.update(targetPosition, motor1.motor.getCurrentPosition());
+            motor1.setPower(power);
+            motor2.setPower(power);
         }
     }
 

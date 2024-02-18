@@ -94,6 +94,12 @@ public class Intake {
 		if (reverseSlidersPower) {
 			slidersPower = -slidersPower;
 		}
+
+		if (limitSwitch.isPressed()) {
+			sliders.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+			sliders.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+		}
+
 		sliders.setPower(slidersPower);
 	}
 
