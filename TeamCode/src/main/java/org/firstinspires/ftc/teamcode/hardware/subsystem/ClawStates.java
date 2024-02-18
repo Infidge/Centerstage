@@ -2,7 +2,7 @@ package org.firstinspires.ftc.teamcode.hardware.subsystem;
 
 import org.firstinspires.ftc.teamcode.hardware.subsystem.constants.ClawConstants;
 
-public class ClawStates {
+class ClawStates {
 
     enum PixelLeft {
         CLOSED(ClawConstants.PIXEL_LEFT_CLOSED),

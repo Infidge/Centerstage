@@ -27,13 +27,11 @@ public class MotionProfile {
 		max_velocity = max_vel;
 	}
 
-	public double getTargetPosition() {
-		return target_dist;
+	public void setDistance(double dist) {
+		target_dist = dist;
 	}
 
-	public void start(double target) {
-		target_dist = target;
-
+	public void start() {
 		acceleration_dt = max_velocity / max_acceleration;
 		double deceleration_dt = max_velocity / max_deceleration;
 

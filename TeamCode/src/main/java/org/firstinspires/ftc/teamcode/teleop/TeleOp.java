@@ -32,17 +32,6 @@ public class TeleOp extends LinearOpMode {
 		waitForStart();
 
 		while (opModeIsActive()) {
-			copyGamepads();
-
-			// Automatic movements (should be placed before any gamepad controls, so that gamepads have precedence)
-			if (robot.intake.arePixelsIn()) {
-				robot.v4b.toTransferPosition();
-			}
-
-			if (robot.claw.arePixelsCaught()) {
-				robot.v4b.toDepositPosition();
-			}
-
 			// Gamepad 1
 			if (gamepad1.right_bumper) {
 				robot.intake.spinInwards();
@@ -68,23 +57,19 @@ public class TeleOp extends LinearOpMode {
 				robot.intake.slidersExtend();
 			}
 
+			if (gamepad1.y) {
+				robot.intake.angleRaise();
+				robot.intake.pixelCoverRaise();
+			}
+
 			robot.drivetrain.update(gamepad1);
 
 			// Gamepad 2
-			if (gamepad2.a) {
-				robot.v4b.toDepositPosition();
+			if (gamepad2.a && !previousGamepad2.a) {
+				robot.v4b.togglePosition();
 			}
 
 			if (gamepad2.b) {
-				robot.v4b.toTransferPosition();
-			}
-
-			if (gamepad2.x) {
-				robot.claw.pixelLeftClose();
-				robot.claw.pixelRightClose();
-			}
-
-			if (gamepad2.y) {
 				robot.claw.pixelLeftOpen();
 				robot.claw.pixelRightOpen();
 			}
@@ -104,6 +89,8 @@ public class TeleOp extends LinearOpMode {
 			if (gamepad2.dpad_down && !previousGamepad2.dpad_down) {
 				robot.lift.pixelLevelDecrement();
 			}
+
+			copyGamepads();
 
 			robot.update();
 		}

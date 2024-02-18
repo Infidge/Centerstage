@@ -33,9 +33,6 @@ public class Intake {
 	private IntakeStates.Sliders lastSlidersState = slidersState;
 	private final PDFController slidersPdfController = new PDFController(IntakeConstants.SLIDERS_P, IntakeConstants.SLIDERS_D, IntakeConstants.SLIDERS_F);
 	private final MotionProfile slidersMotionProfile = new MotionProfile(IntakeConstants.SLIDERS_MAX_ACC, IntakeConstants.SLIDERS_MAX_DEC, IntakeConstants.SLIDERS_MAX_VEL);
-	private boolean slidersMotionFinished = false;
-
-	private boolean pixelsIn = false;
 
 	public Intake() {}
 
@@ -70,32 +67,34 @@ public class Intake {
 			pixelCoverRaise();
 		}
 
-		pixelsIn = leftBeam.isBroken() && rightBeam.isBroken();
-
 		angle.setPosition(angleState.getPos());
 		pixelCover.setPosition(pixelCoverState.getPos());
 		spinners.setPower(spinnersState.getPower());
 
+		boolean reverseSlidersPower = false;
+
 		if (slidersState != lastSlidersState) {
-			slidersMotionProfile.start(slidersState.getPos());
-//			slidersMotionFinished = false;
+			double slidersTargetPosition = slidersState.getPos();
+			double slidersCurrentPosition = sliders.motor.getCurrentPosition();
+			double slidersDistance = slidersTargetPosition - slidersCurrentPosition;
+
+			if (slidersDistance < 0) {
+				reverseSlidersPower = true;
+				slidersDistance = -slidersDistance;
+			}
+
+			slidersMotionProfile.setDistance(slidersDistance);
+			slidersMotionProfile.start();
 			lastSlidersState = slidersState;
 		}
 
-		if (!slidersMotionFinished) {
-			int slidersInstantPosition = (int) slidersMotionProfile.getInstantPosition();
+		int slidersInstantTargetPosition = (int) slidersMotionProfile.getInstantPosition();
 
-//			if (slidersInstantPosition == slidersMotionProfile.getTargetPosition()) {
-//				slidersMotionFinished = true;
-//			}
-
-			double slidersPower = slidersPdfController.update(slidersInstantPosition, sliders.motor.getCurrentPosition());
-			sliders.setPower(slidersPower);
+		double slidersPower = slidersPdfController.update(slidersInstantTargetPosition, sliders.motor.getCurrentPosition());
+		if (reverseSlidersPower) {
+			slidersPower = -slidersPower;
 		}
-	}
-
-	public boolean arePixelsIn() {
-		return pixelsIn;
+		sliders.setPower(slidersPower);
 	}
 
 	public void angleLower() {

@@ -10,41 +10,45 @@ public class V4B {
     private final OptimisedServo armAngleRight = new OptimisedServo();
     private final OptimisedServo clawAngle = new OptimisedServo();
 
-    private V4BStates.ArmAngle armAngleState = V4BStates.ArmAngle.DEPOSIT;
-    private V4BStates.ClawAngle clawAngleState = V4BStates.ClawAngle.DEPOSIT;
+    private V4BState state = V4BState.DEPOSIT;
 
     public V4B() {}
 
     public void init(HardwareMap hwMap) {
         armAngleLeft.setName("armAngleLeft", hwMap);
-        armAngleLeft.setPosition(armAngleState.getLeftPos());
+        armAngleLeft.setPosition(state.getArmAngleLeftPos());
 
         armAngleRight.setName("armAngleRight", hwMap);
-        armAngleRight.setPosition(armAngleState.getRightPos());
+        armAngleRight.setPosition(state.getArmAngleRightPos());
 
         clawAngle.setName("clawAngle", hwMap);
-        clawAngle.setPosition(clawAngleState.getPos());
+        clawAngle.setPosition(state.getClawAnglePos());
     }
 
     public void update() {
-        armAngleLeft.setPosition(armAngleState.getLeftPos());
-        armAngleRight.setPosition(armAngleState.getRightPos());
-        clawAngle.setPosition(clawAngleState.getPos());
+        armAngleLeft.setPosition(state.getArmAngleLeftPos());
+        armAngleRight.setPosition(state.getArmAngleRightPos());
+        clawAngle.setPosition(state.getClawAnglePos());
     }
 
     public boolean isInTransferPosition() {
-        return armAngleState == V4BStates.ArmAngle.TRANSFER
-                && clawAngleState == V4BStates.ClawAngle.TRANSFER;
-    }
-
-    public void toTransferPosition() {
-        armAngleState = V4BStates.ArmAngle.TRANSFER;
-        clawAngleState = V4BStates.ClawAngle.TRANSFER;
+        return state == V4BState.TRANSFER;
     }
 
     public void toDepositPosition() {
-        armAngleState = V4BStates.ArmAngle.DEPOSIT;
-        clawAngleState = V4BStates.ClawAngle.DEPOSIT;
+        state = V4BState.DEPOSIT;
+    }
+
+    public void toTransferPosition() {
+        state = V4BState.TRANSFER;
+    }
+
+    public void togglePosition() {
+        if (state == V4BState.TRANSFER) {
+            state = V4BState.DEPOSIT;
+        } else if (state == V4BState.DEPOSIT) {
+            state = V4BState.TRANSFER;
+        }
     }
 
 }

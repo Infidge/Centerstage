@@ -18,8 +18,6 @@ public class Claw {
 	private ClawStates.PixelLeft pixelLeftState = ClawStates.PixelLeft.OPEN;
 	private ClawStates.PixelRight pixelRightState = ClawStates.PixelRight.OPEN;
 
-	private boolean pixelsCaught = false;
-
 	public void init(HardwareMap hwMap) {
 		rotation.setName("clawRotation", hwMap);
 		rotation.setPosition(rotationState.getPos());
@@ -46,12 +44,6 @@ public class Claw {
 		if (rightBeam.isBroken()) {
 			pixelRightClose();
 		}
-
-		pixelsCaught = leftBeam.isBroken() && rightBeam.isBroken();
-	}
-
-	public boolean arePixelsCaught() {
-		return pixelsCaught;
 	}
 
 	public void rotateHorizontally() {
