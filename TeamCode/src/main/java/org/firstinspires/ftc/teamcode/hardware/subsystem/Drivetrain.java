@@ -10,7 +10,8 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.navigation.VoltageUnit;
 import org.firstinspires.ftc.teamcode.hardware.common.OptimisedMotor;
 import org.firstinspires.ftc.teamcode.pidf.PDFController;
-import org.firstinspires.ftc.teamcode.util.LoopTime;
+
+import java.util.List;
 
 public class Drivetrain {
 
@@ -19,42 +20,39 @@ public class Drivetrain {
 	private final OptimisedMotor rearRight = new OptimisedMotor();
 	private final OptimisedMotor frontRight = new OptimisedMotor();
 
+	private final OptimisedMotor[] motors = new OptimisedMotor[] {frontLeft, rearLeft, frontRight, rearRight};
+	private final double[] powers = new double[4];
+
+	private LynxModule controlHub;
 	private BNO055IMU imu;
 
-	private LynxModule voltageRegulator;
+	private static final double NOMINAL_VOLTAGE = 12.0;
 
-	private Gamepad currentGamepad;
-	private Gamepad prevGamepad;
-
-	private final PDFController headingPDF = new PDFController(0.0, 0.0, 0.0);
-
-	private final LoopTime loopTime = new LoopTime();
-
+	private final PDFController headingPdf = new PDFController(0.0, 0.0, 0.0);
 	private double targetHeading;
-	private boolean headingControl = false;
+
+	private final Gamepad previousGamepad = new Gamepad();
 
 	public Drivetrain() {}
 
 	public void init(HardwareMap hwMap) {
-		frontLeft.setName("front_left", hwMap);
-		rearLeft.setName("rear_left", hwMap);
-		rearRight.setName("rear_right", hwMap);
-		frontRight.setName("front_right", hwMap);
-
-		frontLeft.setPower(0.0);
-		rearLeft.setPower(0.0);
-		rearRight.setPower(0.0);
-		frontRight.setPower(0.0);
-
-		frontLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-		rearLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-		rearRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-		frontRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+		frontLeft.setName("frontLeft", hwMap);
+		rearLeft.setName("rearLeft", hwMap);
+		frontRight.setName("frontRight", hwMap);
+		rearRight.setName("rearRight", hwMap);
 
 		frontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
 		rearLeft.setDirection(DcMotorSimple.Direction.REVERSE);
-		rearRight.setDirection(DcMotorSimple.Direction.FORWARD);
 		frontRight.setDirection(DcMotorSimple.Direction.FORWARD);
+		rearRight.setDirection(DcMotorSimple.Direction.FORWARD);
+
+		for (OptimisedMotor motor : motors) {
+			motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+			motor.setPower(0.0);
+		}
+
+		List<LynxModule> lynxModules = hwMap.getAll(LynxModule.class);
+		controlHub = lynxModules.stream().filter(LynxModule::isParent).findFirst().orElse(null);
 
 		BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
 		parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
@@ -70,52 +68,47 @@ public class Drivetrain {
 		double heading = 0.0;
 
 		/* Heading PDF */
+		boolean headingControl = false;
 		if (turn == 0) {
 			heading = imu.getAngularOrientation().firstAngle;
 			headingControl = true;
-		} else headingControl = false;
+		}
 
-		if (stoppedSteering())
+		if (stoppedSteering(gamepad))
 			targetHeading = heading;
 
 		if (headingControl)
-			turn += headingPDF.update(targetHeading, heading);
+			turn += headingPdf.update(targetHeading, heading);
 
 		/* Mecanum kinematics */
-		double flPower = drive + strafe + turn;
-		double rlPower = drive - strafe + turn;
-		double rrPower = drive + strafe - turn;
-		double frPower = drive - strafe - turn;
+		powers[0] = drive + strafe + turn;
+		powers[1] = drive - strafe + turn;
+		powers[2] = drive - strafe - turn;
+		powers[3] = drive + strafe - turn;
 
-		powerRegulation(flPower, rlPower, rrPower, frPower);
+		powerRegulation();
 
-		frontLeft.setPower(flPower);
-		rearLeft.setPower(rlPower);
-		rearRight.setPower(rrPower);
-		frontRight.setPower(frPower);
-	}
-
-	boolean stoppedSteering() {
-		return (prevGamepad.left_trigger - prevGamepad.right_trigger) != 0.0 &&
-				(currentGamepad.left_trigger - currentGamepad.right_trigger) == 0;
-	}
-
-	private void powerRegulation (double power1, double power2, double power3, double power4) {
-		double max = Math.max(Math.abs(power1), Math.max(Math.abs(power2), Math.max(Math.abs(power3), Math.abs(power4))));
-
-		/* Power wrapping */
-		if (max > 1.0) {
-			power1 /= max;
-			power2 /= max;
-			power3 /= max;
-			power4 /= max;
+		for (int i = 0; i < 4; i++) {
+			motors[i].setPower(powers[i]);
 		}
 
-		/* Voltage correction */
-		power1 *= 12.0 / voltageRegulator.getInputVoltage(VoltageUnit.VOLTS);
-		power2 *= 12.0 / voltageRegulator.getInputVoltage(VoltageUnit.VOLTS);
-		power3 *= 12.0 / voltageRegulator.getInputVoltage(VoltageUnit.VOLTS);
-		power4 *= 12.0 / voltageRegulator.getInputVoltage(VoltageUnit.VOLTS);
+		previousGamepad.copy(gamepad);
+	}
+
+	private boolean stoppedSteering(Gamepad gamepad) {
+		return (previousGamepad.left_trigger - previousGamepad.right_trigger) != 0.0 &&
+				(gamepad.left_trigger - gamepad.right_trigger) == 0;
+	}
+
+	private void powerRegulation() {
+		double maxPower = Math.max(Math.abs(powers[0]), Math.max(Math.abs(powers[1]), Math.max(Math.abs(powers[2]), Math.abs(powers[3]))));
+
+		if (maxPower > 1.0) {
+			for (int i = 0; i < 4; i++) {
+				powers[i] = powers[i] / maxPower;
+				powers[i] = powers[i] * NOMINAL_VOLTAGE / controlHub.getInputVoltage(VoltageUnit.VOLTS);
+			}
+		}
 	}
 
 }

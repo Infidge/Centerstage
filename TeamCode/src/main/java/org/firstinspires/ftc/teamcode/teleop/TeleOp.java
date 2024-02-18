@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.teleop;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.Gamepad;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.hardware.Robot;
 
@@ -19,6 +20,8 @@ public class TeleOp extends LinearOpMode {
 	public void runOpMode() throws InterruptedException {
 		Robot robot = Robot.getInstance();
 		robot.init(hardwareMap);
+
+		ElapsedTime loopTime = new ElapsedTime();
 
 		Gamepad.RumbleEffect errorRumbleEffect = new Gamepad.RumbleEffect.Builder()
 				.addStep(1.0, 0.0, 125)
