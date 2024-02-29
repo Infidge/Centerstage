@@ -15,13 +15,13 @@ import java.util.List;
 
 public class Drivetrain {
 
-	private final OptimisedMotor frontLeft = new OptimisedMotor();
-	private final OptimisedMotor rearLeft = new OptimisedMotor();
-	private final OptimisedMotor rearRight = new OptimisedMotor();
-	private final OptimisedMotor frontRight = new OptimisedMotor();
+	public final OptimisedMotor frontLeft = new OptimisedMotor();
+	public final OptimisedMotor rearLeft = new OptimisedMotor();
+	public final OptimisedMotor rearRight = new OptimisedMotor();
+	public final OptimisedMotor frontRight = new OptimisedMotor();
 
 	private final OptimisedMotor[] motors = new OptimisedMotor[] {frontLeft, rearLeft, frontRight, rearRight};
-	private final double[] powers = new double[4];
+	public final double[] powers = new double[4];
 
 	private LynxModule controlHub;
 	private BNO055IMU imu;
@@ -48,6 +48,7 @@ public class Drivetrain {
 
 		for (OptimisedMotor motor : motors) {
 			motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+			motor.setZeroPowerBehaviour(DcMotor.ZeroPowerBehavior.BRAKE);
 			motor.setPower(0.0);
 		}
 

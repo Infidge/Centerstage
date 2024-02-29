@@ -5,7 +5,9 @@ import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.hardware.Robot;
+import org.firstinspires.ftc.teamcode.hardware.subsystem.Lift;
 
+@com.qualcomm.robotcore.eventloop.opmode.TeleOp(name = "TeleOp", group = "Centerstage")
 public class TeleOp extends LinearOpMode {
 
 	private final Gamepad previousGamepad1 = new Gamepad();
@@ -38,39 +40,39 @@ public class TeleOp extends LinearOpMode {
 			// Gamepad 1
 			if (gamepad1.right_bumper) {
 				robot.intake.spinInwards();
-				robot.intake.angleLower();
-				robot.intake.pixelCoverLower();
+//				robot.intake.angleLower();
+//				robot.intake.pixelCoverLower();
 			} else if (gamepad1.left_bumper) {
 				robot.intake.spinOutwards();
 			} else {
 				robot.intake.spinStop();
 			}
-
-			if (gamepad1.a) {
-				robot.intake.slidersRetract();
-			}
-
-			if (gamepad1.b) {
-				robot.intake.slidersExtend();
-			}
-
-			if (gamepad1.y) {
-				robot.intake.angleRaise();
-				robot.intake.pixelCoverRaise();
-			}
+//
+//			if (gamepad1.a) {
+//				robot.intake.slidersRetract();
+//			}
+//
+//			if (gamepad1.b) {
+//				robot.intake.slidersExtend();
+//			}
+//
+//			if (gamepad1.y) {
+//				robot.intake.angleRaise();
+//				robot.intake.pixelCoverRaise();
+//			}
 
 			robot.drivetrain.update(gamepad1);
 
 			// Gamepad 2
-			if (gamepad2.a && !previousGamepad2.a) {
-				robot.v4b.togglePosition();
-			}
-
-			if (gamepad2.b) {
-				robot.claw.pixelLeftOpen();
-				robot.claw.pixelRightOpen();
-			}
-
+//			if (gamepad2.a && !previousGamepad2.a) {
+//				robot.v4b.togglePosition();
+//			}
+//
+//			if (gamepad2.b) {
+//				robot.claw.pixelLeftOpen();
+//				robot.claw.pixelRightOpen();
+//			}
+//
 			if (gamepad2.left_bumper) {
 				robot.lift.lower();
 			}
@@ -88,6 +90,17 @@ public class TeleOp extends LinearOpMode {
 			}
 
 			copyGamepads();
+
+			telemetry.addData("frontLeft", robot.drivetrain.powers[0]);
+			telemetry.addData("rearLeft", robot.drivetrain.powers[1]);
+			telemetry.addData("frontRight", robot.drivetrain.powers[2]);
+			telemetry.addData("rearRight", robot.drivetrain.powers[3]);
+			telemetry.addData("liftMotorEncoder", robot.lift.motorEncoder.motor.getCurrentPosition());
+			telemetry.addData("liftTargetPosition", robot.lift.liftTargetPosition);
+			telemetry.addData("liftPixelLevel", robot.lift.pixelLevel);
+			telemetry.addData("liftLimitSwitch", robot.lift.limitSwitch.isPressed());
+			telemetry.addData("clawRotation", robot.claw.rotation.getPosition());
+			telemetry.update();
 
 			robot.update();
 		}

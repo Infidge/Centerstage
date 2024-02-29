@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.hardware.subsystem;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
@@ -18,7 +19,7 @@ public class Intake {
 	private final OptimisedServo angle = new OptimisedServo();
 	private final OptimisedServo pixelCover = new OptimisedServo();
 	private final OptimisedMotor sliders = new OptimisedMotor();
-	private OptimisedMotorByBaciu spinners;
+	private final OptimisedMotor spinners = new OptimisedMotor();
 
 	private final LimitSwitch limitSwitch = new LimitSwitch();
 
@@ -29,7 +30,7 @@ public class Intake {
 	private IntakeStates.PixelCover pixelCoverState = IntakeStates.PixelCover.LOWERED;
 	private IntakeStates.Spinners spinnersState = IntakeStates.Spinners.STOP;
 
-	private IntakeStates.Sliders slidersState = IntakeStates.Sliders.RETRACTED;
+	private IntakeStates.Sliders slidersState = IntakeStates.Sliders.RETRACT;
 	private IntakeStates.Sliders lastSlidersState = slidersState;
 	private final PDFController slidersPdfController = new PDFController(IntakeConstants.SLIDERS_P, IntakeConstants.SLIDERS_D, IntakeConstants.SLIDERS_F);
 	private final MotionProfile slidersMotionProfile = new MotionProfile(IntakeConstants.SLIDERS_MAX_ACC, IntakeConstants.SLIDERS_MAX_DEC, IntakeConstants.SLIDERS_MAX_VEL);
@@ -37,70 +38,75 @@ public class Intake {
 	public Intake() {}
 
 	public void init(HardwareMap hwMap) {
-		angle.setName("intakeAngle", hwMap);
-		angle.setPosition(angleState.getPos());
+//		angle.setName("intakeAngle", hwMap);
+//		angle.setPosition(angleState.getPos());
+//
+//		pixelCover.setName("intakePixelCover", hwMap);
+//		pixelCover.setPosition(pixelCoverState.getPos());
+//
+//		sliders.setName("intakeSlides", hwMap);
+//		sliders.setDirection(DcMotorSimple.Direction.FORWARD);
+//		sliders.setZeroPowerBehaviour(DcMotor.ZeroPowerBehavior.BRAKE);
+//		sliders.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+//		sliders.setPower(0.0);
 
-		pixelCover.setName("intakePixelCover", hwMap);
-		pixelCover.setPosition(pixelCoverState.getPos());
-
-		sliders.setName("intakeSliders", hwMap);
-		sliders.setDirection(DcMotorSimple.Direction.FORWARD);
-		sliders.setZeroPowerBehaviour(DcMotor.ZeroPowerBehavior.BRAKE);
-		sliders.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-		sliders.setPower(0.0);
-
-		spinners = hwMap.get(OptimisedMotorByBaciu.class, "intakeSpinners");
+		spinners.setName("intakeSpinners", hwMap);
 		spinners.setDirection(DcMotorSimple.Direction.FORWARD);
-		spinners.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+		spinners.setZeroPowerBehaviour(DcMotor.ZeroPowerBehavior.BRAKE);
 		spinners.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 		spinners.setPower(spinnersState.getPower());
 
-		limitSwitch.setName("intakeLimitSwitch", hwMap);
-
-		leftBeam.setName("intakeLeftBeam", hwMap);
-		rightBeam.setName("intakeRightBeam", hwMap);
+//		limitSwitch.setName("intakeLimitSwitch", hwMap);
+//
+//		leftBeam.setName("intakeLeftBeam", hwMap);
+//		rightBeam.setName("intakeRightBeam", hwMap);
 	}
 
 	public void update() {
-		if (leftBeam.isBroken() && rightBeam.isBroken()) {
-			angleRaise();
-			pixelCoverRaise();
-		}
+//		if (leftBeam.isBroken() && rightBeam.isBroken()) {
+//			angleRaise();
+//			pixelCoverRaise();
+//		}
 
-		angle.setPosition(angleState.getPos());
-		pixelCover.setPosition(pixelCoverState.getPos());
+//		angle.setPosition(angleState.getPos());
+//		pixelCover.setPosition(pixelCoverState.getPos());
 		spinners.setPower(spinnersState.getPower());
 
-		boolean reverseSlidersPower = false;
-
-		if (slidersState != lastSlidersState) {
-			double slidersTargetPosition = slidersState.getPos();
-			double slidersCurrentPosition = sliders.motor.getCurrentPosition();
-			double slidersDistance = slidersTargetPosition - slidersCurrentPosition;
-
-			if (slidersDistance < 0) {
-				reverseSlidersPower = true;
-				slidersDistance = -slidersDistance;
-			}
-
-			slidersMotionProfile.setDistance(slidersDistance);
-			slidersMotionProfile.start();
-			lastSlidersState = slidersState;
-		}
-
-		int slidersInstantTargetPosition = (int) slidersMotionProfile.getInstantPosition();
-
-		double slidersPower = slidersPdfController.update(slidersInstantTargetPosition, sliders.motor.getCurrentPosition());
-		if (reverseSlidersPower) {
-			slidersPower = -slidersPower;
-		}
-
-		if (limitSwitch.isPressed()) {
-			sliders.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-			sliders.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-		}
-
-		sliders.setPower(slidersPower);
+//		if (slidersState == IntakeStates.Sliders.RETRACT) {
+//			if (limitSwitch.isPressed()) {
+//				sliders.setPower(0.0);
+//				sliders.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+//				sliders.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+//			} else {
+//				sliders.setPower(-1.0);
+//			}
+//		} else if (slidersState == IntakeStates.Sliders.EXTEND) {
+//			boolean reverseSlidersPower = false;
+//
+//			if (slidersState != lastSlidersState) {
+//				double slidersTargetPosition = slidersState.getPos();
+//				double slidersCurrentPosition = sliders.motor.getCurrentPosition();
+//				double slidersDistance = slidersTargetPosition - slidersCurrentPosition;
+//
+//				if (slidersDistance < 0) {
+//					reverseSlidersPower = true;
+//					slidersDistance = -slidersDistance;
+//				}
+//
+//				slidersMotionProfile.setDistance(slidersDistance);
+//				slidersMotionProfile.start();
+//				lastSlidersState = slidersState;
+//			}
+//
+//			int slidersInstantTargetPosition = (int) slidersMotionProfile.getInstantPosition();
+//
+//			double slidersPower = slidersPdfController.update(slidersInstantTargetPosition, sliders.motor.getCurrentPosition());
+//			if (reverseSlidersPower) {
+//				slidersPower = -slidersPower;
+//			}
+//
+//			sliders.setPower(slidersPower);
+//		}
 	}
 
 	public void angleLower() {
@@ -120,11 +126,11 @@ public class Intake {
 	}
 
 	public void slidersRetract() {
-		slidersState = IntakeStates.Sliders.RETRACTED;
+		slidersState = IntakeStates.Sliders.RETRACT;
 	}
 
 	public void slidersExtend() {
-		slidersState = IntakeStates.Sliders.EXTENDED;
+		slidersState = IntakeStates.Sliders.EXTEND;
 	}
 
 	public void spinInwards() {

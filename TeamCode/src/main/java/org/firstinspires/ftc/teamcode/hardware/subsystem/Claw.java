@@ -7,7 +7,7 @@ import org.firstinspires.ftc.teamcode.hardware.common.BreakBeam;
 
 public class Claw {
 
-	private final OptimisedServo rotation = new OptimisedServo();
+	public final OptimisedServo rotation = new OptimisedServo();
 	private final OptimisedServo pixelLeft = new OptimisedServo();
 	private final OptimisedServo pixelRight = new OptimisedServo();
 
@@ -27,23 +27,23 @@ public class Claw {
 
 		pixelRight.setName("clawPixelRight", hwMap);
 		pixelRight.setPosition(pixelRightState.getPos());
-
-		leftBeam.setName("clawLeftBeam", hwMap);
-		rightBeam.setName("clawRightBeam", hwMap);
+//
+//		leftBeam.setName("clawLeftBeam", hwMap);
+//		rightBeam.setName("clawRightBeam", hwMap);
 	}
 
 	public void update() {
 		rotation.setPosition(rotationState.getPos());
 		pixelLeft.setPosition(pixelLeftState.getPos());
 		pixelRight.setPosition(pixelRightState.getPos());
-
-		if (leftBeam.isBroken()) {
-			pixelLeftClose();
-		}
-
-		if (rightBeam.isBroken()) {
-			pixelRightClose();
-		}
+//
+//		if (leftBeam.isBroken()) {
+//			pixelLeftClose();
+//		}
+//
+//		if (rightBeam.isBroken()) {
+//			pixelRightClose();
+//		}
 	}
 
 	public void rotateHorizontally() {

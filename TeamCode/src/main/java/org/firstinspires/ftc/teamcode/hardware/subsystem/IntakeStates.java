@@ -35,8 +35,8 @@ class IntakeStates {
 	}
 
 	enum Sliders {
-		RETRACTED(0),
-		EXTENDED(IntakeConstants.SLIDERS_EXTENDED);
+		RETRACT(0),
+		EXTEND(IntakeConstants.SLIDERS_EXTENDED);
 
 		private final int val;
 

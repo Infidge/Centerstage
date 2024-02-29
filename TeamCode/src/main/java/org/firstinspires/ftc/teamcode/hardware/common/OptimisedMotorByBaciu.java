@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorImplEx;
 import com.qualcomm.robotcore.hardware.configuration.typecontainers.MotorConfigurationType;
 
-public class OptimisedMotorByBaciu extends DcMotorImplEx implements DcMotorEx {
+public class OptimisedMotorByBaciu extends DcMotorImplEx {
 
     private double lastPower = 2.0;
     private static final double EPSILON = 0.01;

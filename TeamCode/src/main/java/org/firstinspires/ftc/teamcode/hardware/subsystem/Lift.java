@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.hardware.subsystem;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -10,12 +11,15 @@ import org.firstinspires.ftc.teamcode.hardware.common.OptimisedMotor;
 import org.firstinspires.ftc.teamcode.hardware.subsystem.constants.LiftConstants;
 import org.firstinspires.ftc.teamcode.pidf.PDFController;
 
+@Config
 public class Lift {
 
-    private final OptimisedMotor motor1 = new OptimisedMotor();
-    private final OptimisedMotor motor2 = new OptimisedMotor();
+    public final OptimisedMotor motorEncoder = new OptimisedMotor();
+    public final OptimisedMotor motor = new OptimisedMotor();
 
-    private final LimitSwitch limitSwitch = new LimitSwitch();
+    public final LimitSwitch limitSwitch = new LimitSwitch();
+
+    public int liftTargetPosition = 0;
 
     private enum LiftState {
         STOP,
@@ -23,49 +27,52 @@ public class Lift {
         RAISE
     }
 
-    private LiftState state = LiftState.STOP;
+    private LiftState state = LiftState.RAISE;
 
     private final PDFController pdfController = new PDFController(LiftConstants.LIFT_P, LiftConstants.LIFT_D, LiftConstants.LIFT_F);
 
-    private int pixelLevel = LiftConstants.PIXEL_LEVEL_MIN;
+    public int pixelLevel = LiftConstants.PIXEL_LEVEL_MIN;
 
     public void init(HardwareMap hwMap) {
-        motor1.setName("liftMotorEncoder", hwMap);
-        motor1.setDirection(DcMotorSimple.Direction.FORWARD);
-        motor1.setZeroPowerBehaviour(DcMotor.ZeroPowerBehavior.BRAKE);
-        motor1.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        motor1.setPower(0.0);
+        motorEncoder.setName("liftMotorEncoder", hwMap);
+        motorEncoder.setDirection(DcMotorSimple.Direction.FORWARD);
+        motorEncoder.setZeroPowerBehaviour(DcMotor.ZeroPowerBehavior.BRAKE);
+        motorEncoder.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        motorEncoder.setPower(0.0);
 
-        motor2.setName("liftMotor", hwMap);
-        motor2.setDirection(DcMotorSimple.Direction.FORWARD);
-        motor2.setZeroPowerBehaviour(DcMotor.ZeroPowerBehavior.BRAKE);
-        motor2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        motor2.setPower(0.0);
+        motor.setName("liftMotor", hwMap);
+        motor.setDirection(DcMotorSimple.Direction.FORWARD);
+        motor.setZeroPowerBehaviour(DcMotor.ZeroPowerBehavior.BRAKE);
+        motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        motor.setPower(0.0);
 
         limitSwitch.setName("liftLimitSwitch", hwMap);
     }
 
     public void update() {
+        pdfController.setCoefficients(LiftConstants.LIFT_P, LiftConstants.LIFT_D, LiftConstants.LIFT_F);
+
         if (state == LiftState.LOWER) {
             if (limitSwitch.isPressed()) {
                 state = LiftState.STOP;
-                motor1.setPower(0.0);
-                motor2.setPower(0.0);
-                motor1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-                motor2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-                motor1.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-                motor2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                motorEncoder.setPower(0.0);
+                motor.setPower(0.0);
+                motorEncoder.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                motorEncoder.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
             } else {
-                motor1.setPower(LiftConstants.LOWER_POWER);
-                motor2.setPower(LiftConstants.LOWER_POWER);
+                motorEncoder.setPower(LiftConstants.LOWER_POWER);
+                motor.setPower(LiftConstants.LOWER_POWER);
             }
         } else if (state == LiftState.RAISE) {
             pixelLevel = Range.clip(pixelLevel, LiftConstants.PIXEL_LEVEL_MIN, LiftConstants.PIXEL_LEVEL_MAX);
 
-            int targetPosition = LiftConstants.PIXEL_LEVEL_BASE + LiftConstants.PIXEL_LEVEL_INCREMENT * pixelLevel;
-            int power = pdfController.update(targetPosition, motor1.motor.getCurrentPosition());
-            motor1.setPower(power);
-            motor2.setPower(power);
+            liftTargetPosition = LiftConstants.PIXEL_LEVEL_BASE + LiftConstants.PIXEL_LEVEL_INCREMENT * pixelLevel;
+
+            double power = pdfController.update(liftTargetPosition, motorEncoder.motor.getCurrentPosition());
+            motorEncoder.setPower(power);
+            motor.setPower(power);
         }
     }
 
