@@ -5,7 +5,6 @@ import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.hardware.Robot;
-import org.firstinspires.ftc.teamcode.hardware.subsystem.Lift;
 
 @com.qualcomm.robotcore.eventloop.opmode.TeleOp(name = "TeleOp", group = "Centerstage")
 public class TeleOp extends LinearOpMode {
@@ -91,7 +90,9 @@ public class TeleOp extends LinearOpMode {
 
 			copyGamepads();
 
-			telemetry.addData("intakeMotor", robot.intake.sliders.motor.getCurrentPosition());
+			telemetry.addData("intakeMotorPos", robot.intake.slides.motor.getCurrentPosition());
+			telemetry.addData("intakeMotorPower", robot.intake.slides.motor.getPower());
+			telemetry.addData("intakeLimitSwitch", robot.intake.limitSwitch.isPressed());
 			telemetry.update();
 
 			robot.update();

@@ -1,13 +1,11 @@
 package org.firstinspires.ftc.teamcode.hardware.subsystem;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.teamcode.hardware.common.LimitSwitch;
 import org.firstinspires.ftc.teamcode.hardware.common.OptimisedMotor;
-import org.firstinspires.ftc.teamcode.hardware.common.OptimisedMotorByBaciu;
 import org.firstinspires.ftc.teamcode.hardware.common.OptimisedServo;
 import org.firstinspires.ftc.teamcode.hardware.common.BreakBeam;
 import org.firstinspires.ftc.teamcode.motion.MotionProfile;
@@ -18,10 +16,10 @@ public class Intake {
 
 	private final OptimisedServo angle = new OptimisedServo();
 	private final OptimisedServo pixelCover = new OptimisedServo();
-	public final OptimisedMotor sliders = new OptimisedMotor();
+	public final OptimisedMotor slides = new OptimisedMotor();
 	private final OptimisedMotor spinners = new OptimisedMotor();
 
-	private final LimitSwitch limitSwitch = new LimitSwitch();
+	public final LimitSwitch limitSwitch = new LimitSwitch();
 
 	private final BreakBeam leftBeam = new BreakBeam();
 	private final BreakBeam rightBeam = new BreakBeam();
@@ -30,10 +28,10 @@ public class Intake {
 	private IntakeStates.PixelCover pixelCoverState = IntakeStates.PixelCover.LOWERED;
 	private IntakeStates.Spinners spinnersState = IntakeStates.Spinners.STOP;
 
-	private IntakeStates.Sliders slidersState = IntakeStates.Sliders.RETRACT;
-	private IntakeStates.Sliders lastSlidersState = slidersState;
-	private final PDFController slidersPdfController = new PDFController(IntakeConstants.SLIDERS_P, IntakeConstants.SLIDERS_D, IntakeConstants.SLIDERS_F);
-	private final MotionProfile slidersMotionProfile = new MotionProfile(IntakeConstants.SLIDERS_MAX_ACC, IntakeConstants.SLIDERS_MAX_DEC, IntakeConstants.SLIDERS_MAX_VEL);
+	private IntakeStates.Sliders slidesStates = IntakeStates.Sliders.RETRACT;
+	private IntakeStates.Sliders lastSlidesStates = slidesStates;
+	private final PDFController slidesPdfController = new PDFController(IntakeConstants.SLIDES_P, IntakeConstants.SLIDES_D, IntakeConstants.SLIDES_F);
+	private final MotionProfile slidesMotionProfile = new MotionProfile(IntakeConstants.SLIDES_MAX_ACC, IntakeConstants.SLIDES_MAX_DEC, IntakeConstants.SLIDES_MAX_VEL);
 
 	public Intake() {}
 
@@ -44,11 +42,11 @@ public class Intake {
 		pixelCover.setName("intakePixelCover", hwMap);
 		pixelCover.setPosition(pixelCoverState.getPos());
 
-		sliders.setName("intakeSlides", hwMap);
-		sliders.setDirection(DcMotorSimple.Direction.FORWARD);
-		sliders.setZeroPowerBehaviour(DcMotor.ZeroPowerBehavior.BRAKE);
-		sliders.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-		sliders.setPower(0.0);
+		slides.setName("intakeSlides", hwMap);
+		slides.setDirection(DcMotorSimple.Direction.REVERSE);
+		slides.setZeroPowerBehaviour(DcMotor.ZeroPowerBehavior.BRAKE);
+		slides.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+		slides.setPower(0.0);
 
 		spinners.setName("intakeSpinners", hwMap);
 		spinners.setDirection(DcMotorSimple.Direction.FORWARD);
@@ -72,15 +70,15 @@ public class Intake {
 		pixelCover.setPosition(pixelCoverState.getPos());
 		spinners.setPower(spinnersState.getPower());
 
-		if (slidersState == IntakeStates.Sliders.RETRACT) {
+		if (slidesStates == IntakeStates.Sliders.RETRACT) {
 			if (limitSwitch.isPressed()) {
-				sliders.setPower(0.0);
-				sliders.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-				sliders.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+//				slides.setPower(0.0);
+//				slides.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+//				slides.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 			} else {
-				sliders.setPower(-1.0);
+//				slides.setPower(-1.0);
 			}
-		} else if (slidersState == IntakeStates.Sliders.EXTEND) {
+		} else if (slidesStates == IntakeStates.Sliders.EXTEND) {
 //			boolean reverseSlidersPower = false;
 //
 //			if (slidersState != lastSlidersState) {
@@ -126,11 +124,11 @@ public class Intake {
 	}
 
 	public void slidersRetract() {
-		slidersState = IntakeStates.Sliders.RETRACT;
+		slidesStates = IntakeStates.Sliders.RETRACT;
 	}
 
 	public void slidersExtend() {
-		slidersState = IntakeStates.Sliders.EXTEND;
+		slidesStates = IntakeStates.Sliders.EXTEND;
 	}
 
 	public void spinInwards() {
