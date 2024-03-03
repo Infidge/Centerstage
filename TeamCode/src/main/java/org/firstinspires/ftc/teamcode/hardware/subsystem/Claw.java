@@ -27,7 +27,7 @@ public class Claw {
 
 		pixelRight.setName("clawPixelRight", hwMap);
 		pixelRight.setPosition(pixelRightState.getPos());
-//
+
 //		leftBeam.setName("clawLeftBeam", hwMap);
 //		rightBeam.setName("clawRightBeam", hwMap);
 	}

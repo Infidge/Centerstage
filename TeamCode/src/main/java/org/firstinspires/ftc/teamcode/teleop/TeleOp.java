@@ -91,15 +91,7 @@ public class TeleOp extends LinearOpMode {
 
 			copyGamepads();
 
-			telemetry.addData("frontLeft", robot.drivetrain.powers[0]);
-			telemetry.addData("rearLeft", robot.drivetrain.powers[1]);
-			telemetry.addData("frontRight", robot.drivetrain.powers[2]);
-			telemetry.addData("rearRight", robot.drivetrain.powers[3]);
-			telemetry.addData("liftMotorEncoder", robot.lift.motorEncoder.motor.getCurrentPosition());
-			telemetry.addData("liftTargetPosition", robot.lift.liftTargetPosition);
-			telemetry.addData("liftPixelLevel", robot.lift.pixelLevel);
-			telemetry.addData("liftLimitSwitch", robot.lift.limitSwitch.isPressed());
-			telemetry.addData("clawRotation", robot.claw.rotation.getPosition());
+			telemetry.addData("intakeMotor", robot.intake.sliders.motor.getCurrentPosition());
 			telemetry.update();
 
 			robot.update();

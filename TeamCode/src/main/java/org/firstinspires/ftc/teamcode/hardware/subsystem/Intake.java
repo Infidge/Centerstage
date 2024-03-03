@@ -18,7 +18,7 @@ public class Intake {
 
 	private final OptimisedServo angle = new OptimisedServo();
 	private final OptimisedServo pixelCover = new OptimisedServo();
-	private final OptimisedMotor sliders = new OptimisedMotor();
+	public final OptimisedMotor sliders = new OptimisedMotor();
 	private final OptimisedMotor spinners = new OptimisedMotor();
 
 	private final LimitSwitch limitSwitch = new LimitSwitch();
@@ -26,7 +26,7 @@ public class Intake {
 	private final BreakBeam leftBeam = new BreakBeam();
 	private final BreakBeam rightBeam = new BreakBeam();
 
-	private IntakeStates.Angle angleState = IntakeStates.Angle.LOWERED;
+	private IntakeStates.Angle angleState = IntakeStates.Angle.RAISED;
 	private IntakeStates.PixelCover pixelCoverState = IntakeStates.PixelCover.LOWERED;
 	private IntakeStates.Spinners spinnersState = IntakeStates.Spinners.STOP;
 
@@ -38,17 +38,17 @@ public class Intake {
 	public Intake() {}
 
 	public void init(HardwareMap hwMap) {
-//		angle.setName("intakeAngle", hwMap);
-//		angle.setPosition(angleState.getPos());
-//
-//		pixelCover.setName("intakePixelCover", hwMap);
-//		pixelCover.setPosition(pixelCoverState.getPos());
-//
-//		sliders.setName("intakeSlides", hwMap);
-//		sliders.setDirection(DcMotorSimple.Direction.FORWARD);
-//		sliders.setZeroPowerBehaviour(DcMotor.ZeroPowerBehavior.BRAKE);
-//		sliders.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-//		sliders.setPower(0.0);
+		angle.setName("intakeAngle", hwMap);
+		angle.setPosition(angleState.getPos());
+
+		pixelCover.setName("intakePixelCover", hwMap);
+		pixelCover.setPosition(pixelCoverState.getPos());
+
+		sliders.setName("intakeSlides", hwMap);
+		sliders.setDirection(DcMotorSimple.Direction.FORWARD);
+		sliders.setZeroPowerBehaviour(DcMotor.ZeroPowerBehavior.BRAKE);
+		sliders.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+		sliders.setPower(0.0);
 
 		spinners.setName("intakeSpinners", hwMap);
 		spinners.setDirection(DcMotorSimple.Direction.FORWARD);
@@ -56,8 +56,8 @@ public class Intake {
 		spinners.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 		spinners.setPower(spinnersState.getPower());
 
-//		limitSwitch.setName("intakeLimitSwitch", hwMap);
-//
+		limitSwitch.setName("intakeLimitSwitch", hwMap);
+
 //		leftBeam.setName("intakeLeftBeam", hwMap);
 //		rightBeam.setName("intakeRightBeam", hwMap);
 	}
@@ -68,19 +68,19 @@ public class Intake {
 //			pixelCoverRaise();
 //		}
 
-//		angle.setPosition(angleState.getPos());
-//		pixelCover.setPosition(pixelCoverState.getPos());
+		angle.setPosition(angleState.getPos());
+		pixelCover.setPosition(pixelCoverState.getPos());
 		spinners.setPower(spinnersState.getPower());
 
-//		if (slidersState == IntakeStates.Sliders.RETRACT) {
-//			if (limitSwitch.isPressed()) {
-//				sliders.setPower(0.0);
-//				sliders.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-//				sliders.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-//			} else {
-//				sliders.setPower(-1.0);
-//			}
-//		} else if (slidersState == IntakeStates.Sliders.EXTEND) {
+		if (slidersState == IntakeStates.Sliders.RETRACT) {
+			if (limitSwitch.isPressed()) {
+				sliders.setPower(0.0);
+				sliders.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+				sliders.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+			} else {
+				sliders.setPower(-1.0);
+			}
+		} else if (slidersState == IntakeStates.Sliders.EXTEND) {
 //			boolean reverseSlidersPower = false;
 //
 //			if (slidersState != lastSlidersState) {
@@ -106,7 +106,7 @@ public class Intake {
 //			}
 //
 //			sliders.setPower(slidersPower);
-//		}
+		}
 	}
 
 	public void angleLower() {
