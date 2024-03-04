@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.hardware.subsystem;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -12,6 +13,7 @@ import org.firstinspires.ftc.teamcode.motion.MotionProfile;
 import org.firstinspires.ftc.teamcode.pidf.PDFController;
 import org.firstinspires.ftc.teamcode.hardware.subsystem.constants.IntakeConstants;
 
+@Config
 public class Intake {
 
 	private final OptimisedServo angle = new OptimisedServo();
@@ -28,19 +30,21 @@ public class Intake {
 	private IntakeStates.PixelCover pixelCoverState = IntakeStates.PixelCover.LOWERED;
 	private IntakeStates.Spinners spinnersState = IntakeStates.Spinners.STOP;
 
-	private IntakeStates.Sliders slidesStates = IntakeStates.Sliders.RETRACT;
-	private IntakeStates.Sliders lastSlidesStates = slidesStates;
+	public IntakeStates.Sliders slidesState = IntakeStates.Sliders.EXTEND;
+	private IntakeStates.Sliders lastSlidesStates = slidesState;
 	private final PDFController slidesPdfController = new PDFController(IntakeConstants.SLIDES_P, IntakeConstants.SLIDES_D, IntakeConstants.SLIDES_F);
+	public static volatile double P = 0, D = 0, F = 0;
+	private final PDFController slidesHoldPdfController = new PDFController(P, D, F);
 	private final MotionProfile slidesMotionProfile = new MotionProfile(IntakeConstants.SLIDES_MAX_ACC, IntakeConstants.SLIDES_MAX_DEC, IntakeConstants.SLIDES_MAX_VEL);
 
 	public Intake() {}
 
 	public void init(HardwareMap hwMap) {
 		angle.setName("intakeAngle", hwMap);
-		angle.setPosition(angleState.getPos());
+//		angle.setPosition(angleState.getPos());
 
 		pixelCover.setName("intakePixelCover", hwMap);
-		pixelCover.setPosition(pixelCoverState.getPos());
+//		pixelCover.setPosition(pixelCoverState.getPos());
 
 		slides.setName("intakeSlides", hwMap);
 		slides.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -66,19 +70,25 @@ public class Intake {
 //			pixelCoverRaise();
 //		}
 
-		angle.setPosition(angleState.getPos());
-		pixelCover.setPosition(pixelCoverState.getPos());
+//		angle.setPosition(angleState.getPos());
+//		pixelCover.setPosition(pixelCoverState.getPos());
 		spinners.setPower(spinnersState.getPower());
 
-		if (slidesStates == IntakeStates.Sliders.RETRACT) {
+		slidesHoldPdfController.setCoefficients(P, D, F);
+
+		if (slidesState == IntakeStates.Sliders.RETRACT) {
+			slides.setPower(-1.0);
 			if (limitSwitch.isPressed()) {
-//				slides.setPower(0.0);
-//				slides.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-//				slides.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-			} else {
-//				slides.setPower(-1.0);
+				slidesState = IntakeStates.Sliders.RETRACT_HOLD;
+				slides.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+				slides.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+				slides.setPower(0.0);
 			}
-		} else if (slidesStates == IntakeStates.Sliders.EXTEND) {
+		} else if (slidesState == IntakeStates.Sliders.RETRACT_HOLD) {
+			if (!limitSwitch.isPressed()) {
+				slides.setPower(slidesHoldPdfController.update(15, slides.motor.getCurrentPosition()));
+			}
+		} else if (slidesState == IntakeStates.Sliders.EXTEND) {
 //			boolean reverseSlidersPower = false;
 //
 //			if (slidersState != lastSlidersState) {
@@ -124,11 +134,11 @@ public class Intake {
 	}
 
 	public void slidersRetract() {
-		slidesStates = IntakeStates.Sliders.RETRACT;
+		slidesState = IntakeStates.Sliders.RETRACT;
 	}
 
 	public void slidersExtend() {
-		slidesStates = IntakeStates.Sliders.EXTEND;
+		slidesState = IntakeStates.Sliders.EXTEND;
 	}
 
 	public void spinInwards() {
@@ -143,4 +153,7 @@ public class Intake {
 		spinnersState = IntakeStates.Spinners.STOP;
 	}
 
+	public double getSlidesState() {
+		return slidesState.getPos();
+	}
 }

@@ -1,9 +1,11 @@
 package org.firstinspires.ftc.teamcode.teleop;
 
+import com.acmerobotics.dashboard.FtcDashboard;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.hardware.Robot;
 
 @com.qualcomm.robotcore.eventloop.opmode.TeleOp(name = "TeleOp", group = "Centerstage")
@@ -21,6 +23,8 @@ public class TeleOp extends LinearOpMode {
 	public void runOpMode() throws InterruptedException {
 		Robot robot = Robot.getInstance();
 		robot.init(hardwareMap);
+
+		Telemetry dashboardTelemetry = FtcDashboard.getInstance().getTelemetry();
 
 		ElapsedTime loopTime = new ElapsedTime();
 
@@ -46,15 +50,15 @@ public class TeleOp extends LinearOpMode {
 			} else {
 				robot.intake.spinStop();
 			}
-//
-//			if (gamepad1.a) {
-//				robot.intake.slidersRetract();
-//			}
-//
-//			if (gamepad1.b) {
-//				robot.intake.slidersExtend();
-//			}
-//
+
+			if (gamepad1.a) {
+				robot.intake.slidersRetract();
+			}
+
+			if (gamepad1.b) {
+				robot.intake.slidersExtend();
+			}
+
 //			if (gamepad1.y) {
 //				robot.intake.angleRaise();
 //				robot.intake.pixelCoverRaise();
@@ -94,6 +98,12 @@ public class TeleOp extends LinearOpMode {
 			telemetry.addData("intakeMotorPower", robot.intake.slides.motor.getPower());
 			telemetry.addData("intakeLimitSwitch", robot.intake.limitSwitch.isPressed());
 			telemetry.update();
+
+			dashboardTelemetry.addData("intakeMotorPos", robot.intake.slides.motor.getCurrentPosition());
+			dashboardTelemetry.addData("intakeMotorPower", robot.intake.slides.motor.getPower());
+			dashboardTelemetry.addData("intakeLimitSwitch", robot.intake.limitSwitch.isPressed());
+			dashboardTelemetry.addData("state", robot.intake.getSlidesState());
+			dashboardTelemetry.update();
 
 			robot.update();
 		}

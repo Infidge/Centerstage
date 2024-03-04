@@ -8,7 +8,7 @@ public class OptimisedServo {
     private Servo servo;
 
     private double lastPosition = 2.0;
-    private static final double EPSILON = 0.01;
+    private static final double EPSILON = 0.003;
 
     public OptimisedServo() {}
 

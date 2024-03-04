@@ -6,11 +6,15 @@ import com.acmerobotics.dashboard.config.Config;
 public class IntakeConstants {
 
     public static double ANGLE_LOWERED = 0.56;
-    public static double ANGLE_RAISED = 0.2;
+    public static double ANGLE_PIXEL_2 = 0.5;
+    public static double ANGLE_PIXEL_3 = 0.46;
+    public static double ANGLE_PIXEL_4 = 0.43;
+    public static double ANGLE_PIXEL_5 = 0.395;
+    public static double ANGLE_RAISED = 0.16;
 
     // TODO everything downwards
-    public static double PIXEL_COVER_LOWERED = 0.4;
-    public static double PIXEL_COVER_RAISED = 0.4;
+    public static double PIXEL_COVER_LOWERED = 0.46;
+    public static double PIXEL_COVER_RAISED = 0.0;
 
     public static final int SLIDES_EXTENDED_POS = 450;
 
