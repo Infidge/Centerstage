@@ -20,22 +20,22 @@ public class Claw {
 
 	public void init(HardwareMap hwMap) {
 		rotation.setName("clawRotation", hwMap);
-		rotation.setPosition(rotationState.getPos());
+//		rotation.setPosition(rotationState.getPos());
 
 		pixelLeft.setName("clawPixelLeft", hwMap);
-		pixelLeft.setPosition(pixelLeftState.getPos());
+//		pixelLeft.setPosition(pixelLeftState.getPos());
 
 		pixelRight.setName("clawPixelRight", hwMap);
-		pixelRight.setPosition(pixelRightState.getPos());
+//		pixelRight.setPosition(pixelRightState.getPos());
 
 //		leftBeam.setName("clawLeftBeam", hwMap);
 //		rightBeam.setName("clawRightBeam", hwMap);
 	}
 
 	public void update() {
-		rotation.setPosition(rotationState.getPos());
-		pixelLeft.setPosition(pixelLeftState.getPos());
-		pixelRight.setPosition(pixelRightState.getPos());
+//		rotation.setPosition(rotationState.getPos());
+//		pixelLeft.setPosition(pixelLeftState.getPos());
+//		pixelRight.setPosition(pixelRightState.getPos());
 //
 //		if (leftBeam.isBroken()) {
 //			pixelLeftClose();

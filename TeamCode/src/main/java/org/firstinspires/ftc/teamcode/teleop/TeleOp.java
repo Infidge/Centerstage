@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.teleop;
 
 import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -24,7 +25,7 @@ public class TeleOp extends LinearOpMode {
 		Robot robot = Robot.getInstance();
 		robot.init(hardwareMap);
 
-		Telemetry dashboardTelemetry = FtcDashboard.getInstance().getTelemetry();
+		telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
 		ElapsedTime loopTime = new ElapsedTime();
 
@@ -43,8 +44,8 @@ public class TeleOp extends LinearOpMode {
 			// Gamepad 1
 			if (gamepad1.right_bumper) {
 				robot.intake.spinInwards();
-//				robot.intake.angleLower();
-//				robot.intake.pixelCoverLower();
+				robot.intake.angleLower();
+				robot.intake.pixelCoverLower();
 			} else if (gamepad1.left_bumper) {
 				robot.intake.spinOutwards();
 			} else {
@@ -59,17 +60,17 @@ public class TeleOp extends LinearOpMode {
 				robot.intake.slidersExtend();
 			}
 
-//			if (gamepad1.y) {
-//				robot.intake.angleRaise();
-//				robot.intake.pixelCoverRaise();
-//			}
+			if (gamepad1.y) {
+				robot.intake.angleRaise();
+				robot.intake.pixelCoverRaise();
+			}
 
 			robot.drivetrain.update(gamepad1);
 
 			// Gamepad 2
-//			if (gamepad2.a && !previousGamepad2.a) {
-//				robot.v4b.togglePosition();
-//			}
+			if (gamepad2.a && !previousGamepad2.a) {
+				robot.v4b.togglePosition();
+			}
 //
 //			if (gamepad2.b) {
 //				robot.claw.pixelLeftOpen();
@@ -94,18 +95,16 @@ public class TeleOp extends LinearOpMode {
 
 			copyGamepads();
 
-			telemetry.addData("intakeMotorPos", robot.intake.slides.motor.getCurrentPosition());
-			telemetry.addData("intakeMotorPower", robot.intake.slides.motor.getPower());
-			telemetry.addData("intakeLimitSwitch", robot.intake.limitSwitch.isPressed());
+//			telemetry.addData("intakeMotorPosition", robot.intake.slides.motor.getCurrentPosition());
+//			telemetry.addData("intakeMotorPower", robot.intake.slides.motor.getPower());
+//			telemetry.addData("intakeLimitSwitch", robot.intake.limitSwitch.isPressed());
+//			telemetry.addData("armAngleLeft", robot.v4b.armAngleLeft.getPosition());
+//			telemetry.addData("armAngleRight", robot.v4b.armAngleRight.getPosition());
+//			telemetry.addData("clawAngle", robot.v4b.clawAngle.getPosition());
+			telemetry.addData("motionProfile", robot.v4b.instantPosition);
+			telemetry.addData("state", robot.v4b.stateChanged);
+			robot.update(telemetry);
 			telemetry.update();
-
-			dashboardTelemetry.addData("intakeMotorPos", robot.intake.slides.motor.getCurrentPosition());
-			dashboardTelemetry.addData("intakeMotorPower", robot.intake.slides.motor.getPower());
-			dashboardTelemetry.addData("intakeLimitSwitch", robot.intake.limitSwitch.isPressed());
-			dashboardTelemetry.addData("state", robot.intake.getSlidesState());
-			dashboardTelemetry.update();
-
-			robot.update();
 		}
 	}
 

@@ -13,7 +13,6 @@ import org.firstinspires.ftc.teamcode.motion.MotionProfile;
 import org.firstinspires.ftc.teamcode.pidf.PDFController;
 import org.firstinspires.ftc.teamcode.hardware.subsystem.constants.IntakeConstants;
 
-@Config
 public class Intake {
 
 	private final OptimisedServo angle = new OptimisedServo();
@@ -33,8 +32,7 @@ public class Intake {
 	public IntakeStates.Sliders slidesState = IntakeStates.Sliders.EXTEND;
 	private IntakeStates.Sliders lastSlidesStates = slidesState;
 	private final PDFController slidesPdfController = new PDFController(IntakeConstants.SLIDES_P, IntakeConstants.SLIDES_D, IntakeConstants.SLIDES_F);
-	public static volatile double P = 0, D = 0, F = 0;
-	private final PDFController slidesHoldPdfController = new PDFController(P, D, F);
+	private final PDFController slidesHoldPdfController = new PDFController(IntakeConstants.SLIDES_HOLD_P, IntakeConstants.SLIDES_HOLD_D, IntakeConstants.SLIDES_HOLD_F);
 	private final MotionProfile slidesMotionProfile = new MotionProfile(IntakeConstants.SLIDES_MAX_ACC, IntakeConstants.SLIDES_MAX_DEC, IntakeConstants.SLIDES_MAX_VEL);
 
 	public Intake() {}
@@ -44,7 +42,7 @@ public class Intake {
 //		angle.setPosition(angleState.getPos());
 
 		pixelCover.setName("intakePixelCover", hwMap);
-//		pixelCover.setPosition(pixelCoverState.getPos());
+		pixelCover.setPosition(0.44);
 
 		slides.setName("intakeSlides", hwMap);
 		slides.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -74,7 +72,8 @@ public class Intake {
 //		pixelCover.setPosition(pixelCoverState.getPos());
 		spinners.setPower(spinnersState.getPower());
 
-		slidesHoldPdfController.setCoefficients(P, D, F);
+		slidesHoldPdfController.setCoefficients(IntakeConstants.SLIDES_HOLD_P, IntakeConstants.SLIDES_HOLD_D, IntakeConstants.SLIDES_HOLD_F);
+		slidesMotionProfile.setConstraints(IntakeConstants.SLIDES_MAX_ACC, IntakeConstants.SLIDES_MAX_DEC, IntakeConstants.SLIDES_MAX_VEL);
 
 		if (slidesState == IntakeStates.Sliders.RETRACT) {
 			slides.setPower(-1.0);
@@ -86,13 +85,13 @@ public class Intake {
 			}
 		} else if (slidesState == IntakeStates.Sliders.RETRACT_HOLD) {
 			if (!limitSwitch.isPressed()) {
-				slides.setPower(slidesHoldPdfController.update(15, slides.motor.getCurrentPosition()));
+				slides.setPower(slidesHoldPdfController.update(IntakeConstants.SLIDES_HOLD_TARGET_POSITION, slides.motor.getCurrentPosition()));
 			}
 		} else if (slidesState == IntakeStates.Sliders.EXTEND) {
 //			boolean reverseSlidersPower = false;
 //
 //			if (slidersState != lastSlidersState) {
-//				double slidersTargetPosition = slidersState.getPos();
+//				double slidersTargetPosition = IntakeConstants.SLIDES_EXTENDED_POSITION;
 //				double slidersCurrentPosition = sliders.motor.getCurrentPosition();
 //				double slidersDistance = slidersTargetPosition - slidersCurrentPosition;
 //

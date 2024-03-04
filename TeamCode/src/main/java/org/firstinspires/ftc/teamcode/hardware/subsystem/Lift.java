@@ -11,7 +11,6 @@ import org.firstinspires.ftc.teamcode.hardware.common.OptimisedMotor;
 import org.firstinspires.ftc.teamcode.hardware.subsystem.constants.LiftConstants;
 import org.firstinspires.ftc.teamcode.pidf.PDFController;
 
-@Config
 public class Lift {
 
     public final OptimisedMotor motorEncoder = new OptimisedMotor();
@@ -27,7 +26,7 @@ public class Lift {
         RAISE
     }
 
-    private LiftState state = LiftState.RAISE;
+    private LiftState state = LiftState.STOP;
 
     private final PDFController pdfController = new PDFController(LiftConstants.LIFT_P, LiftConstants.LIFT_D, LiftConstants.LIFT_F);
 
@@ -50,8 +49,6 @@ public class Lift {
     }
 
     public void update() {
-        pdfController.setCoefficients(LiftConstants.LIFT_P, LiftConstants.LIFT_D, LiftConstants.LIFT_F);
-
         if (state == LiftState.LOWER) {
             if (limitSwitch.isPressed()) {
                 state = LiftState.STOP;
