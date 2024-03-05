@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.hardware.subsystem;
 
 import com.acmerobotics.dashboard.config.Config;
+import com.qualcomm.hardware.rev.RevColorSensorV3;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -22,14 +23,14 @@ public class Intake {
 
 	public final LimitSwitch limitSwitch = new LimitSwitch();
 
-	private final BreakBeam leftBeam = new BreakBeam();
-	private final BreakBeam rightBeam = new BreakBeam();
+	private final RevColorSensorV3 leftSensor = null;
+	private final RevColorSensorV3 rightSensor = null;
 
 	private IntakeStates.Angle angleState = IntakeStates.Angle.RAISED;
 	private IntakeStates.PixelCover pixelCoverState = IntakeStates.PixelCover.LOWERED;
 	private IntakeStates.Spinners spinnersState = IntakeStates.Spinners.STOP;
 
-	public IntakeStates.Sliders slidesState = IntakeStates.Sliders.RETRACT_HOLD;
+	public IntakeStates.Sliders slidesState = IntakeStates.Sliders.STOP;
 	private IntakeStates.Sliders lastSlidesStates = slidesState;
 	private final PDFController slidesPdfController = new PDFController(IntakeConstants.SLIDES_P, IntakeConstants.SLIDES_D, IntakeConstants.SLIDES_F);
 	private final PDFController slidesHoldPdfController = new PDFController(IntakeConstants.SLIDES_HOLD_P, IntakeConstants.SLIDES_HOLD_D, IntakeConstants.SLIDES_HOLD_F);

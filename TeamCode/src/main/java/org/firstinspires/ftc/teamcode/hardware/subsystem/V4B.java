@@ -15,72 +15,95 @@ public class V4B {
     public final OptimisedServo armAngleRight = new OptimisedServo();
     public final OptimisedServo clawAngle = new OptimisedServo();
 
-    private final PDFController pdfController = new PDFController(V4BConstants.ARM_P, V4BConstants.ARM_D, V4BConstants.ARM_F);
     private final MotionProfile motionProfile = new MotionProfile(V4BConstants.ARM_MAX_ACC, V4BConstants.ARM_MAX_DEC, V4BConstants.ARM_MAX_VEL);
-
-    public static double DISTANCE = 0.75;
-    public double instantPosition = 0;
 
     private V4BState state = V4BState.DEPOSIT;
     private V4BState lastState = state;
-//    public boolean stateChanged = false;
+    public boolean stateChanged = false;
+
+    private boolean motionProfileReversed = false;
+    private boolean motionProfileStopped = false;
+    private double motionProfilePositionAtStop = 0.0;
 
     public V4B() {}
 
     public void init(HardwareMap hwMap) {
         armAngleLeft.setName("armAngleLeft", hwMap);
-//        armAngleLeft.setPosition(state.getArmAngleLeftPos());
+        armAngleLeft.setPosition(state.getArmAngleLeftPos());
 
         armAngleRight.setName("armAngleRight", hwMap);
-//        armAngleRight.setPosition(state.getArmAngleRightPos());
+        armAngleRight.setPosition(state.getArmAngleRightPos());
 
         clawAngle.setName("clawAngle", hwMap);
-//        clawAngle.setPosition(state.getClawAnglePos());
+        clawAngle.setPosition(state.getClawAnglePos());
     }
 
     public void update(Telemetry telemetry) {
-//        armAngleLeft.setPosition(state.getArmAngleLeftPos());
-//        armAngleRight.setPosition(state.getArmAngleRightPos());
-//        clawAngle.setPosition(state.getClawAnglePos());
+        clawAngle.setPosition(state.getClawAnglePos());
 
-        /*pdfController.setCoefficients(V4BConstants.ARM_P, V4BConstants.ARM_D, V4BConstants.ARM_F);
+        if (stateChanged) {
+            double motionProfileDistance = 0.0;
+            if (motionProfile.isFinished()) {
+                motionProfile.setConstraints(V4BConstants.ARM_MAX_ACC, V4BConstants.ARM_MAX_DEC, V4BConstants.ARM_MAX_VEL);
 
-        if (lastState != state) {
-            motionProfile.setConstraints(V4BConstants.ARM_MAX_ACC, V4BConstants.ARM_MAX_DEC, V4BConstants.ARM_MAX_VEL);
-
-            double dx = lastState.getArmAngleLeftPos() - state.getArmAngleLeftPos();
-            boolean reverse = false;
-            if (dx < 0) {
-                dx = -dx;
-                reverse = true;
+                motionProfileStopped = false;
+                motionProfileDistance = state.getArmAngleLeftPos() - lastState.getArmAngleLeftPos();
+            } else {
+                motionProfileStopped = true;
+                motionProfilePositionAtStop = armAngleLeft.getPosition();
+                motionProfileDistance = state.getArmAngleLeftPos() - armAngleLeft.getPosition();
             }
 
-            motionProfile.setDistance(dx);
-            motionProfile.start();
+            if (motionProfileDistance < 0) {
+                motionProfileDistance = -motionProfileDistance;
+                motionProfileReversed = true;
+            } else {
+                motionProfileReversed = false;
+            }
+
+            motionProfile.setDistance(motionProfileDistance);
+            motionProfile.start(telemetry);
+
+            stateChanged = false;
         }
 
-        instantPosition = motionProfile.getInstantPosition(telemetry);
-
-        if (instantPosition == state.getArmAngleLeftPos()) {
+        if (motionProfile.isFinished()) {
+            armAngleLeft.setPosition(state.getArmAngleLeftPos());
+            armAngleRight.setPosition(state.getArmAngleRightPos());
             lastState = state;
+        } else {
+            double startPosition;
+            if (motionProfileStopped) {
+                startPosition = motionProfilePositionAtStop;
+            } else {
+                startPosition = lastState.getArmAngleLeftPos();
+            }
+
+            double instantPosition = motionProfile.getInstantPosition();
+
+            double armPosition;
+            if (motionProfileReversed) {
+                armPosition = startPosition - instantPosition;
+            } else {
+                armPosition = startPosition + instantPosition;
+            }
+
+            armAngleLeft.setPosition(armPosition);
+            armAngleRight.setPosition(1 - armPosition);
         }
 
-        double armLeftPosition = instantPosition + state.getArmAngleLeftPos();
+        telemetry.addData("instant", motionProfile.getInstantPosition());
 
-        armAngleLeft.setPosition(armLeftPosition);
-        armAngleRight.setPosition(1.0 - armLeftPosition);*/
-    }
-
-    public boolean isInTransferPosition() {
-        return state == V4BState.TRANSFER;
     }
 
     public void toDepositPosition() {
         state = V4BState.DEPOSIT;
+        stateChanged = true;
     }
 
     public void toTransferPosition() {
         state = V4BState.TRANSFER;
+        stateChanged = true;
     }
 
     public void togglePosition() {
@@ -89,6 +112,7 @@ public class V4B {
         } else if (state == V4BState.DEPOSIT) {
             state = V4BState.TRANSFER;
         }
+        stateChanged = true;
     }
 
 }

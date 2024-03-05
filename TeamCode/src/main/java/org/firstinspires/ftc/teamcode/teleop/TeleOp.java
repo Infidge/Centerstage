@@ -27,15 +27,6 @@ public class TeleOp extends LinearOpMode {
 
 		telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
-		ElapsedTime loopTime = new ElapsedTime();
-
-		Gamepad.RumbleEffect errorRumbleEffect = new Gamepad.RumbleEffect.Builder()
-				.addStep(1.0, 0.0, 125)
-				.addStep(0.0, 1.0, 125)
-				.addStep(1.0, 0.0, 125)
-				.addStep(0.0, 1.0, 125)
-				.build();
-
 		copyGamepads();
 
 		waitForStart();
@@ -53,11 +44,11 @@ public class TeleOp extends LinearOpMode {
 			}
 
 			if (gamepad1.a) {
-				robot.intake.slidersRetract();
+//				robot.intake.slidersRetract();
 			}
 
 			if (gamepad1.b) {
-				robot.intake.slidersExtend();
+//				robot.intake.slidersExtend();
 			}
 
 			if (gamepad1.y) {
@@ -95,15 +86,8 @@ public class TeleOp extends LinearOpMode {
 
 			copyGamepads();
 
-//			telemetry.addData("intakeMotorPosition", robot.intake.slides.motor.getCurrentPosition());
-//			telemetry.addData("intakeMotorPower", robot.intake.slides.motor.getPower());
-//			telemetry.addData("intakeLimitSwitch", robot.intake.limitSwitch.isPressed());
-//			telemetry.addData("armAngleLeft", robot.v4b.armAngleLeft.getPosition());
-//			telemetry.addData("armAngleRight", robot.v4b.armAngleRight.getPosition());
-//			telemetry.addData("clawAngle", robot.v4b.clawAngle.getPosition());
-			telemetry.addData("motionProfile", robot.v4b.instantPosition);
-			//telemetry.addData("state", robot.v4b.stateChanged);
 			robot.update(telemetry);
+			telemetry.addData("armAngleLeftPosition", robot.v4b.armAngleLeft.getPosition());
 			telemetry.update();
 		}
 	}
