@@ -29,7 +29,7 @@ public class Intake {
 	private IntakeStates.PixelCover pixelCoverState = IntakeStates.PixelCover.LOWERED;
 	private IntakeStates.Spinners spinnersState = IntakeStates.Spinners.STOP;
 
-	public IntakeStates.Sliders slidesState = IntakeStates.Sliders.EXTEND;
+	public IntakeStates.Sliders slidesState = IntakeStates.Sliders.RETRACT_HOLD;
 	private IntakeStates.Sliders lastSlidesStates = slidesState;
 	private final PDFController slidesPdfController = new PDFController(IntakeConstants.SLIDES_P, IntakeConstants.SLIDES_D, IntakeConstants.SLIDES_F);
 	private final PDFController slidesHoldPdfController = new PDFController(IntakeConstants.SLIDES_HOLD_P, IntakeConstants.SLIDES_HOLD_D, IntakeConstants.SLIDES_HOLD_F);
@@ -39,7 +39,7 @@ public class Intake {
 
 	public void init(HardwareMap hwMap) {
 		angle.setName("intakeAngle", hwMap);
-//		angle.setPosition(angleState.getPos());
+		angle.setPosition(angleState.getPos());
 
 		pixelCover.setName("intakePixelCover", hwMap);
 		pixelCover.setPosition(0.44);

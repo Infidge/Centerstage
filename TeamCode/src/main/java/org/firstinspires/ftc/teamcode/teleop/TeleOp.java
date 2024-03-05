@@ -102,7 +102,7 @@ public class TeleOp extends LinearOpMode {
 //			telemetry.addData("armAngleRight", robot.v4b.armAngleRight.getPosition());
 //			telemetry.addData("clawAngle", robot.v4b.clawAngle.getPosition());
 			telemetry.addData("motionProfile", robot.v4b.instantPosition);
-			telemetry.addData("state", robot.v4b.stateChanged);
+			//telemetry.addData("state", robot.v4b.stateChanged);
 			robot.update(telemetry);
 			telemetry.update();
 		}

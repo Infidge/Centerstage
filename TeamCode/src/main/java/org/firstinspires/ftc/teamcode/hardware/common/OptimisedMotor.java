@@ -35,6 +35,10 @@ public class OptimisedMotor {
         return this.motor.getCurrent(unit);
     }
 
+    public double getCurrentPosition() {
+        return this.motor.getCurrentPosition();
+    }
+
     public void setDirection(DcMotorSimple.Direction direction) {
         this.motor.setDirection(direction);
     }

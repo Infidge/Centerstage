@@ -46,7 +46,7 @@ public class V4B {
         /*pdfController.setCoefficients(V4BConstants.ARM_P, V4BConstants.ARM_D, V4BConstants.ARM_F);
 
         if (lastState != state) {
-            motionProfile.setConstraints(V4BConstants.ARM_MAX_ACC, V4BConstants.ARM_MAX_DEC, V4BConstants.ARM_MAX_VEL;
+            motionProfile.setConstraints(V4BConstants.ARM_MAX_ACC, V4BConstants.ARM_MAX_DEC, V4BConstants.ARM_MAX_VEL);
 
             double dx = lastState.getArmAngleLeftPos() - state.getArmAngleLeftPos();
             boolean reverse = false;
@@ -62,10 +62,13 @@ public class V4B {
         instantPosition = motionProfile.getInstantPosition(telemetry);
 
         if (instantPosition == state.getArmAngleLeftPos()) {
-            lastState = state;*/
+            lastState = state;
         }
 
         double armLeftPosition = instantPosition + state.getArmAngleLeftPos();
+
+        armAngleLeft.setPosition(armLeftPosition);
+        armAngleRight.setPosition(1.0 - armLeftPosition);*/
     }
 
     public boolean isInTransferPosition() {
