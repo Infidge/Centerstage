@@ -1,7 +1,7 @@
 package org.firstinspires.ftc.teamcode.hardware;
 
-import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.hardware.subsystem.Claw;
@@ -19,6 +19,25 @@ public class Robot {
 	public final Claw claw;
 	public final Lift lift;
 	public final V4B v4b;
+
+	private enum TransferStates {
+		WAIT_INTAKE_TO_HAVE_PIXELS(0),
+		WAIT_V4B_MOVE_TO_WAIT_FOR_COVER_RAISE(1),
+		WAIT_PIXEL_COVER_TO_RAISE(2),
+		WAIT_V4B_MOVE_TO_TRANSFER(3),
+		WAIT_FOR_PIXEL_CLAWS_TO_CLOSE(4),
+		WAIT_V4B_MOVE_TO_DEPOSIT(5);
+
+		public int id;
+
+		TransferStates(int id) {
+			this.id = id;
+		}
+	}
+
+	private TransferStates state = TransferStates.WAIT_INTAKE_TO_HAVE_PIXELS;
+	private final ElapsedTime time = new ElapsedTime();
+	private boolean requestedTransfer = false;
 
 	private Robot()	{
 		drivetrain = new Drivetrain();
@@ -48,6 +67,61 @@ public class Robot {
 		claw.update();
 		lift.update();
 		v4b.update(telemetry);
+
+		telemetry.addData("requested", requestedTransfer);
+		telemetry.addData("time", time.seconds());
+		telemetry.addData("stateChanged", v4b.stateChanged);
+
+		if (requestedTransfer) {
+			switch (state) {
+				case WAIT_INTAKE_TO_HAVE_PIXELS:
+					if (intake.hasPixels() && v4b.isInWaitOnCoverPosition()) {
+						state = TransferStates.WAIT_V4B_MOVE_TO_WAIT_FOR_COVER_RAISE;
+						v4b.toWaitForCoverRaisePosition();
+						time.reset();
+					}
+					break;
+				case WAIT_V4B_MOVE_TO_WAIT_FOR_COVER_RAISE:
+					if (time.seconds() > 4.0) {
+						state = TransferStates.WAIT_PIXEL_COVER_TO_RAISE;
+						intake.pixelCoverRaise();
+						time.reset();
+					}
+					break;
+				case WAIT_PIXEL_COVER_TO_RAISE:
+					if (time.seconds() > 10.0) {
+						state = TransferStates.WAIT_V4B_MOVE_TO_TRANSFER;
+						v4b.toTransferPosition();
+						time.reset();
+					}
+					break;
+				case WAIT_V4B_MOVE_TO_TRANSFER:
+					if (time.seconds() > 10.0) {
+						state = TransferStates.WAIT_FOR_PIXEL_CLAWS_TO_CLOSE;
+						claw.pixelLeftClose();
+						claw.pixelRightClose();
+						time.reset();
+					}
+					break;
+				case WAIT_FOR_PIXEL_CLAWS_TO_CLOSE:
+					if (time.seconds() > 10.0) {
+						state = TransferStates.WAIT_V4B_MOVE_TO_DEPOSIT;
+						v4b.toDepositPosition();
+						time.reset();
+					}
+					break;
+				case WAIT_V4B_MOVE_TO_DEPOSIT:
+					if (time.seconds() > 10.0) {
+//						state = TransferStates.WAIT_INTAKE_TO_HAVE_PIXELS;
+//						intake.pixelCoverLower();
+						requestedTransfer = false;
+					}
+					break;
+			}
+		}
 	}
 
+	public void requestTransfer() {
+		requestedTransfer = true;
+	}
 }

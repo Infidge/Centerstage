@@ -1,13 +1,12 @@
 package org.firstinspires.ftc.teamcode.hardware.subsystem;
 
-import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.hardware.common.OptimisedServo;
 import org.firstinspires.ftc.teamcode.hardware.subsystem.constants.V4BConstants;
 import org.firstinspires.ftc.teamcode.motion.MotionProfile;
-import org.firstinspires.ftc.teamcode.pidf.PDFController;
 
 public class V4B {
 
@@ -15,15 +14,19 @@ public class V4B {
     public final OptimisedServo armAngleRight = new OptimisedServo();
     public final OptimisedServo clawAngle = new OptimisedServo();
 
-    private final MotionProfile motionProfile = new MotionProfile(V4BConstants.ARM_MAX_ACC, V4BConstants.ARM_MAX_DEC, V4BConstants.ARM_MAX_VEL);
-
     private V4BState state = V4BState.DEPOSIT;
     private V4BState lastState = state;
     public boolean stateChanged = false;
 
-    private boolean motionProfileReversed = false;
-    private boolean motionProfileStopped = false;
-    private double motionProfilePositionAtStop = 0.0;
+    private final MotionProfile armMotionProfile = new MotionProfile(V4BConstants.ARM_MAX_ACC, V4BConstants.ARM_MAX_DEC, V4BConstants.ARM_MAX_VEL);
+    private boolean armMotionProfileReversed = false;
+    private boolean armMotionProfileStopped = false;
+    private double armMotionProfilePositionAtStop = 0.0;
+
+    private final MotionProfile clawMotionProfile = new MotionProfile(V4BConstants.CLAW_MAX_ACC, V4BConstants.CLAW_MAX_DEC, V4BConstants.CLAW_MAX_VEL);
+    private boolean clawMotionProfileReversed = false;
+    private boolean clawMotionProfileStopped = false;
+    private double clawMotionProfilePositionAtStop = 0.0;
 
     public V4B() {}
 
@@ -39,65 +42,118 @@ public class V4B {
     }
 
     public void update(Telemetry telemetry) {
-        clawAngle.setPosition(state.getClawAnglePos());
-
         if (stateChanged) {
-            double motionProfileDistance = 0.0;
-            if (motionProfile.isFinished()) {
-                motionProfile.setConstraints(V4BConstants.ARM_MAX_ACC, V4BConstants.ARM_MAX_DEC, V4BConstants.ARM_MAX_VEL);
+            double armMotionProfileDistance;
+            if (armMotionProfile.isFinished()) {
+                armMotionProfile.setConstraints(V4BConstants.ARM_MAX_ACC, V4BConstants.ARM_MAX_DEC, V4BConstants.ARM_MAX_VEL);
 
-                motionProfileStopped = false;
-                motionProfileDistance = state.getArmAngleLeftPos() - lastState.getArmAngleLeftPos();
+                armMotionProfileStopped = false;
+                armMotionProfileDistance = state.getArmAngleLeftPos() - lastState.getArmAngleLeftPos();
             } else {
-                motionProfileStopped = true;
-                motionProfilePositionAtStop = armAngleLeft.getPosition();
-                motionProfileDistance = state.getArmAngleLeftPos() - armAngleLeft.getPosition();
+                armMotionProfileStopped = true;
+                armMotionProfilePositionAtStop = armAngleLeft.getPosition();
+                armMotionProfileDistance = state.getArmAngleLeftPos() - armAngleLeft.getPosition();
             }
 
-            if (motionProfileDistance < 0) {
-                motionProfileDistance = -motionProfileDistance;
-                motionProfileReversed = true;
+            if (armMotionProfileDistance < 0) {
+                armMotionProfileDistance = -armMotionProfileDistance;
+                armMotionProfileReversed = true;
             } else {
-                motionProfileReversed = false;
+                armMotionProfileReversed = false;
             }
 
-            motionProfile.setDistance(motionProfileDistance);
-            motionProfile.start(telemetry);
+            armMotionProfile.setDistance(armMotionProfileDistance);
+            armMotionProfile.start(telemetry);
+
+            double clawMotionProfileDistance;
+            if (clawMotionProfile.isFinished()) {
+                clawMotionProfile.setConstraints(V4BConstants.CLAW_MAX_ACC, V4BConstants.CLAW_MAX_DEC, V4BConstants.CLAW_MAX_VEL);
+
+                clawMotionProfileStopped = false;
+                clawMotionProfileDistance = state.getClawAnglePos() - lastState.getClawAnglePos();
+            } else {
+                clawMotionProfileStopped = true;
+                clawMotionProfilePositionAtStop = clawAngle.getPosition();
+                clawMotionProfileDistance = state.getClawAnglePos() - clawAngle.getPosition();
+            }
+
+            if (clawMotionProfileDistance < 0) {
+                clawMotionProfileDistance = -clawMotionProfileDistance;
+                clawMotionProfileReversed = true;
+            } else {
+                clawMotionProfileReversed = false;
+            }
+
+            clawMotionProfile.setDistance(clawMotionProfileDistance);
+            clawMotionProfile.start(telemetry);
 
             stateChanged = false;
         }
 
-        if (motionProfile.isFinished()) {
+        if (armMotionProfile.isFinished() && clawMotionProfile.isFinished()) {
             armAngleLeft.setPosition(state.getArmAngleLeftPos());
             armAngleRight.setPosition(state.getArmAngleRightPos());
+            clawAngle.setPosition(state.getClawAnglePos());
+
+//            telemetry.addData("inst", clawMotionProfile.getInstantPosition());
+
             lastState = state;
         } else {
-            double startPosition;
-            if (motionProfileStopped) {
-                startPosition = motionProfilePositionAtStop;
+            double armStartPosition;
+            if (armMotionProfileStopped) {
+                armStartPosition = armMotionProfilePositionAtStop;
             } else {
-                startPosition = lastState.getArmAngleLeftPos();
+                armStartPosition = lastState.getArmAngleLeftPos();
             }
 
-            double instantPosition = motionProfile.getInstantPosition();
+            double armInstantPosition = armMotionProfile.getInstantPosition();
 
             double armPosition;
-            if (motionProfileReversed) {
-                armPosition = startPosition - instantPosition;
+            if (armMotionProfileReversed) {
+                armPosition = armStartPosition - armInstantPosition;
             } else {
-                armPosition = startPosition + instantPosition;
+                armPosition = armStartPosition + armInstantPosition;
             }
 
             armAngleLeft.setPosition(armPosition);
             armAngleRight.setPosition(1 - armPosition);
+
+            double clawStartPosition;
+            if (clawMotionProfileStopped) {
+                clawStartPosition = clawMotionProfilePositionAtStop;
+            } else {
+                clawStartPosition = lastState.getClawAnglePos();
+            }
+
+            double clawInstantPosition = clawMotionProfile.getInstantPosition();
+
+//            telemetry.addData("inst", clawInstantPosition);
+
+            double clawPosition;
+            if (clawMotionProfileReversed) {
+                clawPosition = clawStartPosition - clawInstantPosition;
+            } else {
+                clawPosition = clawStartPosition + clawInstantPosition;
+            }
+
+            clawAngle.setPosition(clawPosition);
         }
 
-        telemetry.addData("instant", motionProfile.getInstantPosition());
-
+        telemetry.addData("finished", clawMotionProfile.isFinished());
     }
 
     public void toDepositPosition() {
         state = V4BState.DEPOSIT;
+        stateChanged = true;
+    }
+
+    public void toWaitOnCoverPosition() {
+        state = V4BState.WAIT_ON_COVER;
+        stateChanged = true;
+    }
+
+    public void toWaitForCoverRaisePosition() {
+        state = V4BState.WAIT_FOR_COVER_RAISE;
         stateChanged = true;
     }
 
@@ -107,12 +163,15 @@ public class V4B {
     }
 
     public void togglePosition() {
-        if (state == V4BState.TRANSFER) {
+        if (state == V4BState.WAIT_ON_COVER) {
             state = V4BState.DEPOSIT;
         } else if (state == V4BState.DEPOSIT) {
-            state = V4BState.TRANSFER;
+            state = V4BState.WAIT_ON_COVER;
         }
         stateChanged = true;
     }
 
+    public boolean isInWaitOnCoverPosition() {
+        return state == V4BState.WAIT_ON_COVER;
+    }
 }

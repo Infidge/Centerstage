@@ -43,13 +43,13 @@ public class TeleOp extends LinearOpMode {
 				robot.intake.spinStop();
 			}
 
-			if (gamepad1.a) {
+//			if (gamepad1.a) {
 //				robot.intake.slidersRetract();
-			}
+//			}
 
-			if (gamepad1.b) {
+//			if (gamepad1.b) {
 //				robot.intake.slidersExtend();
-			}
+//			}
 
 			if (gamepad1.y) {
 				robot.intake.angleRaise();
@@ -60,8 +60,30 @@ public class TeleOp extends LinearOpMode {
 
 			// Gamepad 2
 			if (gamepad2.a && !previousGamepad2.a) {
-				robot.v4b.togglePosition();
+				// if pixel cover isnt lowered, dont move to wait on cover
+//				robot.v4b.togglePosition();
+				robot.v4b.toTransferPosition();
 			}
+
+			if (gamepad2.b && !previousGamepad2.b) {
+//				robot.requestTransfer();
+				robot.v4b.toWaitForCoverRaisePosition();
+			}
+
+			if (gamepad2.x && !previousGamepad2.x) {
+				robot.v4b.toWaitOnCoverPosition();
+			}
+
+			if (gamepad2.y && !previousGamepad2.y) {
+				robot.v4b.toDepositPosition();
+			}
+
+//			if (robot.intake.isReadyForTransfer() && robot.v4b.isInTransferPosition()) {
+//				robot.claw.pixelLeftClose();
+//				robot.claw.pixelRightClose();
+//
+////				robot.v4b.toDepositPosition();
+//			}
 //
 //			if (gamepad2.b) {
 //				robot.claw.pixelLeftOpen();
@@ -88,6 +110,8 @@ public class TeleOp extends LinearOpMode {
 
 			robot.update(telemetry);
 			telemetry.addData("armAngleLeftPosition", robot.v4b.armAngleLeft.getPosition());
+			telemetry.addData("clawAnglePosition", robot.v4b.clawAngle.getPosition());
+			telemetry.addData("hasPixels", robot.intake.hasPixels());
 			telemetry.update();
 		}
 	}

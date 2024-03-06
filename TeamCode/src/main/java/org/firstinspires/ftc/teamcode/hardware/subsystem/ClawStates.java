@@ -36,6 +36,7 @@ class ClawStates {
 
     enum Rotation {
         HORIZONTAL(ClawConstants.ROTATION_HORIZONTAL),
+        HORIZONTAL_TWO(ClawConstants.ROTATION_HORIZONTAL_TWO),
         VERTICAL(ClawConstants.ROTATION_VERTICAL);
 
         private final double val;

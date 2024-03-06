@@ -34,28 +34,27 @@ class IntakeStates {
 		}
 	}
 
-	enum Sliders {
-		RETRACT(0),
-		RETRACT_HOLD(1),
-		STOP(2),
-		EXTEND(IntakeConstants.SLIDES_EXTENDED_POSITION);
-
-		private final int val;
-
-		Sliders(int val) {
-			this.val = val;
-		}
-
-		double getPos() {
-			return val;
-		}
-	}
+//	enum Sliders {
+//		RETRACT(0),
+//		RETRACT_HOLD(1),
+//		STOP(2),
+//		EXTEND(IntakeConstants.SLIDES_EXTENDED_POSITION);
+//
+//		private final int val;
+//
+//		Sliders(int val) {
+//			this.val = val;
+//		}
+//
+//		double getPos() {
+//			return val;
+//		}
+//	}
 
 	enum Spinners {
 		STOP(0.0),
 		IN(IntakeConstants.SPINNERS_IN_POWER),
-		OUT(IntakeConstants.SPINNERS_OUT_POWER),
-		TRANSFER(IntakeConstants.SPINNERS_TRANSFER_POWER);
+		OUT(IntakeConstants.SPINNERS_OUT_POWER);
 
 		private final double val;
 

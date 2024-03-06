@@ -5,6 +5,8 @@ import org.firstinspires.ftc.teamcode.hardware.subsystem.constants.V4BConstants;
 enum V4BState {
 
     DEPOSIT(V4BConstants.ARM_ANGLE_DEPOSIT, V4BConstants.CLAW_ANGLE_DEPOSIT),
+    WAIT_ON_COVER(V4BConstants.ARM_ANGLE_WAIT_ON_COVER, V4BConstants.CLAW_ANGLE_WAIT_ON_COVER),
+    WAIT_FOR_COVER_RAISE(V4BConstants.ARM_ANGLE_WAIT_FOR_COVER_RAISE, V4BConstants.CLAW_ANGLE_WAIT_FOR_COVER_RAISE),
     TRANSFER(V4BConstants.ARM_ANGLE_TRANSFER, V4BConstants.CLAW_ANGLE_TRANSFER);
 
     private final double armAnglePos, clawAnglePos;

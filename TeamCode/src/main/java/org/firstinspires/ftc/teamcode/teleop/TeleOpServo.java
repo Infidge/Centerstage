@@ -17,10 +17,10 @@ public class TeleOpServo extends LinearOpMode {
     public static volatile double PIXEL_RIGHT_POS = 0.5;
 
     public static volatile double ANGLE_POS = 0.5;
-    public static volatile double PIXEL_COVER_POS = 0.4;
+    public static volatile double PIXEL_COVER_POS = 0.2;
 
     public static volatile double ARM_ANGLE_LEFT_POS = 0.5;
-    public static volatile double CLAW_ANGLE_POS = 0.65;
+    public static volatile double CLAW_ANGLE_POS = 0.5;
 
     // claw
     private final OptimisedServo rotation = new OptimisedServo();
