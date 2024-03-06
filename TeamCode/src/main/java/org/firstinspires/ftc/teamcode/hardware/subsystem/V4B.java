@@ -20,13 +20,9 @@ public class V4B {
 
     private final MotionProfile armMotionProfile = new MotionProfile(V4BConstants.ARM_MAX_ACC, V4BConstants.ARM_MAX_DEC, V4BConstants.ARM_MAX_VEL);
     private boolean armMotionProfileReversed = false;
-    private boolean armMotionProfileStopped = false;
-    private double armMotionProfilePositionAtStop = 0.0;
 
     private final MotionProfile clawMotionProfile = new MotionProfile(V4BConstants.CLAW_MAX_ACC, V4BConstants.CLAW_MAX_DEC, V4BConstants.CLAW_MAX_VEL);
     private boolean clawMotionProfileReversed = false;
-    private boolean clawMotionProfileStopped = false;
-    private double clawMotionProfilePositionAtStop = 0.0;
 
     public V4B() {}
 
@@ -42,19 +38,10 @@ public class V4B {
     }
 
     public void update(Telemetry telemetry) {
-        if (stateChanged) {
-            double armMotionProfileDistance;
-            if (armMotionProfile.isFinished()) {
-                armMotionProfile.setConstraints(V4BConstants.ARM_MAX_ACC, V4BConstants.ARM_MAX_DEC, V4BConstants.ARM_MAX_VEL);
+        if (stateChanged && armMotionProfile.isFinished() && clawMotionProfile.isFinished()) {
+            armMotionProfile.setConstraints(V4BConstants.ARM_MAX_ACC, V4BConstants.ARM_MAX_DEC, V4BConstants.ARM_MAX_VEL);
 
-                armMotionProfileStopped = false;
-                armMotionProfileDistance = state.getArmAngleLeftPos() - lastState.getArmAngleLeftPos();
-            } else {
-                armMotionProfileStopped = true;
-                armMotionProfilePositionAtStop = armAngleLeft.getPosition();
-                armMotionProfileDistance = state.getArmAngleLeftPos() - armAngleLeft.getPosition();
-            }
-
+            double armMotionProfileDistance = state.getArmAngleLeftPos() - lastState.getArmAngleLeftPos();
             if (armMotionProfileDistance < 0) {
                 armMotionProfileDistance = -armMotionProfileDistance;
                 armMotionProfileReversed = true;
@@ -65,17 +52,9 @@ public class V4B {
             armMotionProfile.setDistance(armMotionProfileDistance);
             armMotionProfile.start(telemetry);
 
-            double clawMotionProfileDistance;
-            if (clawMotionProfile.isFinished()) {
-                clawMotionProfile.setConstraints(V4BConstants.CLAW_MAX_ACC, V4BConstants.CLAW_MAX_DEC, V4BConstants.CLAW_MAX_VEL);
+            clawMotionProfile.setConstraints(V4BConstants.CLAW_MAX_ACC, V4BConstants.CLAW_MAX_DEC, V4BConstants.CLAW_MAX_VEL);
 
-                clawMotionProfileStopped = false;
-                clawMotionProfileDistance = state.getClawAnglePos() - lastState.getClawAnglePos();
-            } else {
-                clawMotionProfileStopped = true;
-                clawMotionProfilePositionAtStop = clawAngle.getPosition();
-                clawMotionProfileDistance = state.getClawAnglePos() - clawAngle.getPosition();
-            }
+            double clawMotionProfileDistance = state.getClawAnglePos() - lastState.getClawAnglePos();
 
             if (clawMotionProfileDistance < 0) {
                 clawMotionProfileDistance = -clawMotionProfileDistance;
@@ -95,17 +74,9 @@ public class V4B {
             armAngleRight.setPosition(state.getArmAngleRightPos());
             clawAngle.setPosition(state.getClawAnglePos());
 
-//            telemetry.addData("inst", clawMotionProfile.getInstantPosition());
-
             lastState = state;
         } else {
-            double armStartPosition;
-            if (armMotionProfileStopped) {
-                armStartPosition = armMotionProfilePositionAtStop;
-            } else {
-                armStartPosition = lastState.getArmAngleLeftPos();
-            }
-
+            double armStartPosition = lastState.getArmAngleLeftPos();
             double armInstantPosition = armMotionProfile.getInstantPosition();
 
             double armPosition;
@@ -118,16 +89,8 @@ public class V4B {
             armAngleLeft.setPosition(armPosition);
             armAngleRight.setPosition(1 - armPosition);
 
-            double clawStartPosition;
-            if (clawMotionProfileStopped) {
-                clawStartPosition = clawMotionProfilePositionAtStop;
-            } else {
-                clawStartPosition = lastState.getClawAnglePos();
-            }
-
+            double clawStartPosition = lastState.getClawAnglePos();
             double clawInstantPosition = clawMotionProfile.getInstantPosition();
-
-//            telemetry.addData("inst", clawInstantPosition);
 
             double clawPosition;
             if (clawMotionProfileReversed) {
@@ -139,7 +102,6 @@ public class V4B {
             clawAngle.setPosition(clawPosition);
         }
 
-        telemetry.addData("finished", clawMotionProfile.isFinished());
     }
 
     public void toDepositPosition() {
