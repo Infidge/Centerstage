@@ -71,6 +71,7 @@ public class Robot {
 		telemetry.addData("requested", requestedTransfer);
 		telemetry.addData("time", time.seconds());
 		telemetry.addData("stateChanged", v4b.stateChanged);
+		telemetry.addData("state: ", state);
 
 		if (requestedTransfer) {
 			switch (state) {
@@ -78,25 +79,27 @@ public class Robot {
 					if (intake.hasPixels() && v4b.isInWaitOnCoverPosition()) {
 						state = TransferStates.WAIT_V4B_MOVE_TO_WAIT_FOR_COVER_RAISE;
 						v4b.toWaitForCoverRaisePosition();
+						claw.pixelLeftOpen();
+						claw.pixelRightOpen();
 						time.reset();
 					}
 					break;
 				case WAIT_V4B_MOVE_TO_WAIT_FOR_COVER_RAISE:
-					if (time.seconds() > 4.0) {
+					if (time.seconds() > 1.0) {
 						state = TransferStates.WAIT_PIXEL_COVER_TO_RAISE;
 						intake.pixelCoverRaise();
 						time.reset();
 					}
 					break;
 				case WAIT_PIXEL_COVER_TO_RAISE:
-					if (time.seconds() > 10.0) {
+					if (time.seconds() > 1.0) {
 						state = TransferStates.WAIT_V4B_MOVE_TO_TRANSFER;
 						v4b.toTransferPosition();
 						time.reset();
 					}
 					break;
 				case WAIT_V4B_MOVE_TO_TRANSFER:
-					if (time.seconds() > 10.0) {
+					if (time.seconds() > 1.0) {
 						state = TransferStates.WAIT_FOR_PIXEL_CLAWS_TO_CLOSE;
 						claw.pixelLeftClose();
 						claw.pixelRightClose();
@@ -104,16 +107,16 @@ public class Robot {
 					}
 					break;
 				case WAIT_FOR_PIXEL_CLAWS_TO_CLOSE:
-					if (time.seconds() > 10.0) {
+					if (time.seconds() > 1.0) {
 						state = TransferStates.WAIT_V4B_MOVE_TO_DEPOSIT;
 						v4b.toDepositPosition();
 						time.reset();
 					}
 					break;
 				case WAIT_V4B_MOVE_TO_DEPOSIT:
-					if (time.seconds() > 10.0) {
-//						state = TransferStates.WAIT_INTAKE_TO_HAVE_PIXELS;
-//						intake.pixelCoverLower();
+					if (time.seconds() > 1.0) {
+						state = TransferStates.WAIT_INTAKE_TO_HAVE_PIXELS;
+						intake.pixelCoverLower();
 						requestedTransfer = false;
 					}
 					break;

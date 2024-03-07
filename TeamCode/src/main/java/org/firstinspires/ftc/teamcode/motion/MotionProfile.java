@@ -41,6 +41,9 @@ public class MotionProfile {
 	}
 
 	public void start(Telemetry telemetry) {
+		if (target_dist < 0.01)
+			return;
+
 		acceleration_dt = max_velocity / max_acceleration;
 		deceleration_dt = max_velocity / max_deceleration;
 

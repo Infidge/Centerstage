@@ -61,13 +61,13 @@ public class TeleOp extends LinearOpMode {
 			// Gamepad 2
 			if (gamepad2.a && !previousGamepad2.a) {
 				// if pixel cover isnt lowered, dont move to wait on cover
-//				robot.v4b.togglePosition();
-				robot.v4b.toTransferPosition();
+				robot.v4b.togglePosition();
+				//robot.v4b.toTransferPosition();
 			}
 
 			if (gamepad2.b && !previousGamepad2.b) {
-//				robot.requestTransfer();
-				robot.v4b.toWaitForCoverRaisePosition();
+				robot.requestTransfer();
+				//robot.v4b.toWaitForCoverRaisePosition();
 			}
 
 			if (gamepad2.x && !previousGamepad2.x) {

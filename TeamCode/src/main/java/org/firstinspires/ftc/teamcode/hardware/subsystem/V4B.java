@@ -100,6 +100,13 @@ public class V4B {
             }
 
             clawAngle.setPosition(clawPosition);
+
+            telemetry.addData("v4b state", state);
+            telemetry.addData("lastState", lastState);
+            telemetry.addData("clawMotionProfileDistance", clawMotionProfile.getDistance());
+            telemetry.addData("armMotionProfileDistance", armMotionProfile.getDistance());
+            telemetry.addData("armMotionProfileFinished", armMotionProfile.isFinished());
+            telemetry.addData("clawMotionProfileFinished", clawMotionProfile.isFinished());
         }
 
     }
