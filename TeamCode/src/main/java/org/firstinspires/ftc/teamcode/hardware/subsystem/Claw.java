@@ -17,13 +17,13 @@ public class Claw {
 
 	public void init(HardwareMap hwMap) {
 		rotation.setName("clawRotation", hwMap);
-		rotation.setPosition(rotationState.getPos());
+		rotation.setPosition(rotationState.getPos(), true);
 
 		pixelLeft.setName("clawPixelLeft", hwMap);
-		pixelLeft.setPosition(pixelLeftState.getPos());
+		pixelLeft.setPosition(pixelLeftState.getPos(), true);
 
 		pixelRight.setName("clawPixelRight", hwMap);
-		pixelRight.setPosition(pixelRightState.getPos());
+		pixelRight.setPosition(pixelRightState.getPos(), true);
 	}
 
 	public void update() {

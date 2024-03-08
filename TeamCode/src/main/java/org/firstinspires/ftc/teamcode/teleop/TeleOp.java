@@ -71,11 +71,8 @@ public class TeleOp extends LinearOpMode {
 			}
 
 			if (gamepad2.x && !previousGamepad2.x) {
-				robot.v4b.toWaitOnCoverPosition();
-			}
-
-			if (gamepad2.y && !previousGamepad2.y) {
-				robot.v4b.toDepositPosition();
+				robot.claw.pixelLeftOpen();
+				robot.claw.pixelRightOpen();
 			}
 
 //			if (robot.intake.isReadyForTransfer() && robot.v4b.isInTransferPosition()) {

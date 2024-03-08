@@ -42,10 +42,10 @@ public class Intake {
 
 	public void init(HardwareMap hwMap) {
 		angle.setName("intakeAngle", hwMap);
-		angle.setPosition(angleState.getPos());
+		angle.setPosition(angleState.getPos(), true);
 
 		pixelCover.setName("intakePixelCover", hwMap);
-		pixelCover.setPosition(pixelCoverState.getPos());
+		pixelCover.setPosition(pixelCoverState.getPos(), true);
 
 //		slides.setName("intakeSlides", hwMap);
 //		slides.setDirection(DcMotorSimple.Direction.REVERSE);

@@ -23,6 +23,13 @@ public class OptimisedServo {
         }
     }
 
+    public void setPosition(double position, boolean inInit) {
+        if (Math.abs(lastPosition - position) > EPSILON || inInit) {
+            this.servo.setPosition(position);
+            this.lastPosition = position;
+        }
+    }
+
     public double getPosition() {
         return this.lastPosition;
     }

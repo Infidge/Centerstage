@@ -12,7 +12,7 @@ public class IntakeConstants {
     public static double ANGLE_PIXEL_5 = 0.395;
     public static double ANGLE_RAISED = 0.38;
 
-    public static double PIXEL_COVER_LOWERED = 0.55;
+    public static double PIXEL_COVER_LOWERED = 0.58;
     public static double PIXEL_COVER_RAISED = 0.07;
 
 //    public static int SLIDES_HOLD_TARGET_POSITION = 15;

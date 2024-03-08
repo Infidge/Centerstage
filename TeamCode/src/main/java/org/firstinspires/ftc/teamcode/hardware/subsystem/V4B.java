@@ -28,13 +28,13 @@ public class V4B {
 
     public void init(HardwareMap hwMap) {
         armAngleLeft.setName("armAngleLeft", hwMap);
-        armAngleLeft.setPosition(state.getArmAngleLeftPos());
+        armAngleLeft.setPosition(state.getArmAngleLeftPos(), true);
 
         armAngleRight.setName("armAngleRight", hwMap);
-        armAngleRight.setPosition(state.getArmAngleRightPos());
+        armAngleRight.setPosition(state.getArmAngleRightPos(), true);
 
         clawAngle.setName("clawAngle", hwMap);
-        clawAngle.setPosition(state.getClawAnglePos());
+        clawAngle.setPosition(state.getClawAnglePos(), true);
     }
 
     public void update(Telemetry telemetry) {

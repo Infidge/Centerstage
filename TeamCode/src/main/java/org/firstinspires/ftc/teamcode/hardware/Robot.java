@@ -26,7 +26,8 @@ public class Robot {
 		WAIT_PIXEL_COVER_TO_RAISE(2),
 		WAIT_V4B_MOVE_TO_TRANSFER(3),
 		WAIT_FOR_PIXEL_CLAWS_TO_CLOSE(4),
-		WAIT_V4B_MOVE_TO_DEPOSIT(5);
+		WAIT_V4B_TO_DEPOSIT_INTER(5),
+		WAIT_V4B_MOVE_TO_DEPOSIT(6);
 
 		public int id;
 
@@ -85,21 +86,21 @@ public class Robot {
 					}
 					break;
 				case WAIT_V4B_MOVE_TO_WAIT_FOR_COVER_RAISE:
-					if (time.seconds() > 1.0) {
+					if (time.seconds() > 0.3) {
 						state = TransferStates.WAIT_PIXEL_COVER_TO_RAISE;
 						intake.pixelCoverRaise();
 						time.reset();
 					}
 					break;
 				case WAIT_PIXEL_COVER_TO_RAISE:
-					if (time.seconds() > 1.0) {
+					if (time.seconds() > 0.4) {
 						state = TransferStates.WAIT_V4B_MOVE_TO_TRANSFER;
 						v4b.toTransferPosition();
 						time.reset();
 					}
 					break;
 				case WAIT_V4B_MOVE_TO_TRANSFER:
-					if (time.seconds() > 1.0) {
+					if (time.seconds() > 0.4) {
 						state = TransferStates.WAIT_FOR_PIXEL_CLAWS_TO_CLOSE;
 						claw.pixelLeftClose();
 						claw.pixelRightClose();
@@ -107,14 +108,20 @@ public class Robot {
 					}
 					break;
 				case WAIT_FOR_PIXEL_CLAWS_TO_CLOSE:
-					if (time.seconds() > 1.0) {
+					if (time.seconds() > 0.2) {
+						state = TransferStates.WAIT_V4B_TO_DEPOSIT_INTER;
+						v4b.toWaitForCoverRaisePosition();
+						time.reset();
+					}
+					break;
+				case WAIT_V4B_TO_DEPOSIT_INTER:
+					if (time.seconds() > 0.3) {
 						state = TransferStates.WAIT_V4B_MOVE_TO_DEPOSIT;
 						v4b.toDepositPosition();
 						time.reset();
 					}
-					break;
 				case WAIT_V4B_MOVE_TO_DEPOSIT:
-					if (time.seconds() > 1.0) {
+					if (time.seconds() > 0.5) {
 						state = TransferStates.WAIT_INTAKE_TO_HAVE_PIXELS;
 						intake.pixelCoverLower();
 						requestedTransfer = false;
