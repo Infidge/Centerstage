@@ -54,7 +54,7 @@ public class Intake {
 //		slides.setPower(0.0);
 
 		spinners.setName("intakeSpinners", hwMap);
-		spinners.setDirection(DcMotorSimple.Direction.FORWARD);
+		spinners.setDirection(DcMotorSimple.Direction.FORWARD);////
 		spinners.setZeroPowerBehaviour(DcMotor.ZeroPowerBehavior.BRAKE);
 		spinners.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 		spinners.setPower(spinnersState.getPower());

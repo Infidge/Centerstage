@@ -24,7 +24,7 @@ public class Drivetrain {
 	public final double[] powers = new double[4];
 
 	private LynxModule controlHub;
-	private BNO055IMU imu;
+	//private BNO055IMU imu;
 
 	private static final double NOMINAL_VOLTAGE = 12.0;
 
@@ -58,8 +58,8 @@ public class Drivetrain {
 		BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
 		parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
 
-		imu = hwMap.get(BNO055IMU.class, "imu");
-		imu.initialize(parameters);
+		//imu = hwMap.get(BNO055IMU.class, "imu");
+		//imu.initialize(parameters);
 	}
 
 	public void update(Gamepad gamepad) {
@@ -70,10 +70,10 @@ public class Drivetrain {
 
 		/* Heading PDF */
 		boolean headingControl = false;
-		if (turn == 0) {
+		/*if (turn == 0) {
 			heading = imu.getAngularOrientation().firstAngle;
 			headingControl = true;
-		}
+		}*/
 
 		if (stoppedSteering(gamepad))
 			targetHeading = heading;

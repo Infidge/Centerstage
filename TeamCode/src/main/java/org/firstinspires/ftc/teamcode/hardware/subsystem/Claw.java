@@ -56,4 +56,12 @@ public class Claw {
 		pixelRightState = ClawStates.PixelRight.OPEN;
 	}
 
+	public boolean pixelLeftIsOpen() {
+		return pixelLeftState == ClawStates.PixelLeft.OPEN;
+	}
+
+	public boolean pixelRightIsOpen() {
+		return pixelRightState == ClawStates.PixelRight.OPEN;
+	}
+
 }

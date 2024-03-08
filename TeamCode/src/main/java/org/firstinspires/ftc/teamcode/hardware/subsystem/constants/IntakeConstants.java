@@ -31,7 +31,6 @@ public class IntakeConstants {
 //    public static double SLIDES_MAX_VEL = 0.0;
 
     public static final double SPINNERS_IN_POWER       = 1.0;
-    public static final double SPINNERS_OUT_POWER      = -1.0;
-    public static final double SPINNERS_TRANSFER_POWER = -1.0;
+    public static final double SPINNERS_OUT_POWER      = -0.5;
 
 }
